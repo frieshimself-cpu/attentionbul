@@ -20,8 +20,8 @@ Drop the original mascot PNG into `assets/logo.png` — the site automatically p
 ## Things to fill in before launch
 
 - **Contract address** — replace `TBA — dropping soon` inside the `#caText` element in `index.html`.
-- **Links** — the Buy / Chart / Telegram / X / TikTok buttons currently point to `#`. Search `href="#"` in `index.html` and paste the real URLs.
-- **20% TBA allocation** — the creator-rewards split currently shown is 25 / 25 / 10 / 10 / 10 (= 80%); the remaining 20% is displayed as a "TBA" segment. Update the flywheel section when it's decided.
+- **Links** — the Buy / Chart / Telegram / X buttons currently point to `#`. Search `href="#"` in `index.html` and paste the real URLs.
+- **20% TBA allocation** — the creator-rewards split currently shown is 50 / 10 / 10 / 10 (= 80%); the remaining 20% is displayed as a "TBA" segment. Update the flywheel section when it's decided.
 
 ## Deploying on GitHub Pages
 
