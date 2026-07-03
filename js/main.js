@@ -22,18 +22,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
-// Legend wallet copy buttons
-document.querySelectorAll('.lw-copy').forEach((btn) =>
-  btn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(btn.dataset.wallet);
-      showToast(`${btn.dataset.name}'s wallet copied! 🐋`);
-    } catch {
-      showToast('Copy failed — use the ↗ link instead');
-    }
-  })
-);
-
 // Mobile nav
 const burger = document.getElementById('navBurger');
 const navLinks = document.getElementById('navLinks');

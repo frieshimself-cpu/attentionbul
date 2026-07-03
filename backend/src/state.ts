@@ -24,7 +24,7 @@ const stateDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '
 const statePath = path.join(stateDir, 'state.json');
 
 const EMPTY: BotState = {
-  buckets: { pairSpam: '0', bagworkers: '0', legends: '0' },
+  buckets: { pairSpam: '0', bagworkers: '0' },
   totalClaimedLamports: '0',
   spamLaunchCount: 0,
   lastCycleAt: null,

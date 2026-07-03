@@ -33,23 +33,14 @@ export function lamportsToSol(lamports: bigint): number {
 
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
- * 50% pair spam / 25% bagworker payroll / 25% buyback -> legends.
+ * 50% pair spam / 50% bagworker army.
  */
 export const ALLOCATION_BPS = {
   pairSpam: 5_000,
-  bagworkers: 2_500,
-  legends: 2_500,
+  bagworkers: 5_000,
 } as const;
 
 export type Bucket = keyof typeof ALLOCATION_BPS;
-
-/** The four legend wallets. Bought-back supply is split equally between them. */
-export const LEGEND_WALLETS: ReadonlyArray<{ name: string; address: string }> = [
-  { name: 'Alon', address: '6DtEedWf9Wk5hA7Xth82Eq441yf5DA4aGLqaQAVfDokm' },
-  { name: 'Cupsey', address: 'suqh5sHtr8HyJ7q8scBimULPkPpA557prMG47xCHQfK' },
-  { name: 'Gake', address: 'DNfuF1L62WWyW3pNakVkyGGFzVVhj4Yr52jSmdTyeBHm' },
-  { name: 'Ansem', address: 'GV6UUmNxz2RpKxmNAPadYKb7uQpszwqQAu3qLJxVdC52' },
-];
 
 export const config = {
   rpcUrl: envStr('RPC_URL', 'https://api.mainnet-beta.solana.com'),
@@ -73,12 +64,12 @@ export const config = {
   officialTelegram: process.env.OFFICIAL_TELEGRAM ?? '',
 
   slippageBps: envNum('SLIPPAGE_BPS', 300),
-  jupiterApiKey: process.env.JUPITER_API_KEY ?? '',
 } as const;
 
 /**
- * BULLPOST_MINT and BAGWORKER_WALLET may be unset pre-launch — the cycle
- * skips those steps with a warning. Anything that IS set must be well-formed.
+ * BULLPOST_MINT (used only to stamp the official CA into spam metadata) and
+ * BAGWORKER_WALLET may be unset pre-launch — the cycle skips/omits those with
+ * a warning. Anything that IS set must be well-formed.
  */
 export function validateLiveConfig(): void {
   const total = Object.values(ALLOCATION_BPS).reduce((a, b) => a + b, 0);
@@ -86,5 +77,4 @@ export function validateLiveConfig(): void {
   if (!config.creatorWalletSecret) throw new Error('CREATOR_WALLET_SECRET is required');
   if (config.bullpostMint) new PublicKey(config.bullpostMint); // throws if malformed
   if (config.bagworkerWallet) new PublicKey(config.bagworkerWallet);
-  for (const w of LEGEND_WALLETS) new PublicKey(w.address);
 }

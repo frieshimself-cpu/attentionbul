@@ -22,7 +22,7 @@ Drop the original mascot PNG into `assets/logo.png` — the site automatically p
 - **Contract address** — replace `TBA — dropping soon` inside the `#caText` element in `index.html`.
 - **Links** — the Buy / Chart / Telegram / X buttons currently point to `#`. Search `href="#"` in `index.html` and paste the real URLs.
 
-The creator-rewards split shown on the site: 50% pair spam, 25% bagworker payroll, 25% buybacks sent to Alon, Cupsey, Gake and Ansem.
+The creator-rewards split shown on the site: 50% pair spam, 50% bagworker army.
 
 ## Deploying on GitHub Pages
 
