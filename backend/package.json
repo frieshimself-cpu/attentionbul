@@ -11,6 +11,7 @@
     "claimable": "tsx src/index.ts --claimable",
     "claim": "tsx src/index.ts --claim",
     "launch-one": "tsx src/index.ts --launch-one",
+    "spam": "tsx src/index.ts --spam",
     "sweep": "tsx src/index.ts --sweep",
     "test": "tsx test/split.test.ts",
     "typecheck": "tsc --noEmit"

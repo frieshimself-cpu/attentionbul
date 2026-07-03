@@ -7,7 +7,9 @@ import { connection } from './rpc.js';
 import { claimRewards, getClaimable } from './claim.js';
 import { payBagworkers } from './payroll.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
+import { runSpamEngine, throttleIntervalSec } from './engine.js';
 import { sweepDevWallets } from './sweep.js';
+import { loadDevWallets } from './keystore.js';
 import { log, ledger } from './log.js';
 
 const MIN_PAYROLL_LAMPORTS = solToLamports(0.01);
@@ -109,11 +111,37 @@ function printStatus(state: BotState): void {
   );
 }
 
+/** Live management view: on-chain balance, claimable fees, runway, rate, dev wallets. */
+async function printManagementView(treasury: Keypair, state: BotState): Promise<void> {
+  const [balance, claimable] = await Promise.all([
+    connection.getBalance(treasury.publicKey, 'confirmed').then((b) => BigInt(b)),
+    getClaimable(treasury),
+  ]);
+  const spendable = balance > config.reserveLamports ? balance - config.reserveLamports : 0n;
+  const runway = Number(spendable / launchCostLamports());
+  const interval = throttleIntervalSec(runway);
+  const wallets = loadDevWallets();
+  const unswept = wallets.filter((w) => w.status !== 'swept').length;
+
+  log('================ $BULLPOST bot status ================');
+  log(`treasury:   ${treasury.publicKey.toBase58()}`);
+  log(`balance:    ${lamportsToSol(balance).toFixed(4)} SOL  (spendable ${lamportsToSol(spendable).toFixed(4)}, reserve ${lamportsToSol(config.reserveLamports).toFixed(4)})`);
+  log(`claimable:  ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
+  log(`runway:     ${runway} more pairs at ${lamportsToSol(launchCostLamports()).toFixed(4)} SOL each`);
+  log(`cadence:    burst ${config.spamBurstSize} every ${interval}s at this balance (min ${config.spamMinIntervalSec}s / max ${config.spamMaxIntervalSec}s)`);
+  log(`launched:   ${state.spamLaunchCount} lifetime | dev wallets tracked ${wallets.length} (${unswept} unswept — reclaim with 'npm run sweep')`);
+  printStatus(state);
+  log('======================================================');
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const state = loadState();
+  const maxArg = args.indexOf('--max');
+  const maxLaunches = maxArg >= 0 ? Number(args[maxArg + 1]) : undefined;
 
-  if (args.includes('--status')) {
+  // Offline status (no wallet needed): state file only.
+  if (args.includes('--status') && !config.creatorWalletSecret) {
     printStatus(state);
     log('allocation: 50% pair spam / 50% bagworker army');
     return;
@@ -121,7 +149,20 @@ async function main(): Promise<void> {
 
   validateLiveConfig();
   const creator = loadKeypair(config.creatorWalletSecret);
+
+  // Live management view.
+  if (args.includes('--status')) {
+    await printManagementView(creator, state);
+    return;
+  }
+
   log(`wallet: ${creator.publicKey.toBase58()}`);
+
+  // Continuous throttled spam engine (claim -> burst -> throttle -> repeat).
+  if (args.includes('--spam')) {
+    await runSpamEngine(creator, state, Number.isFinite(maxLaunches) ? maxLaunches : undefined);
+    return;
+  }
 
   // ---- test commands (each does ONE thing, so you can prove a path in isolation) ----
 

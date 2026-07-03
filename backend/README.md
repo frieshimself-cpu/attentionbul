@@ -44,11 +44,43 @@ You need:
 ## Running
 
 ```bash
-npm run cycle      # one full cycle
+npm run spam       # THROTTLED SPAM ENGINE: claim -> burst -> throttle -> repeat
+npm run status     # live management view (balance, claimable, runway, cadence)
+npm run cycle      # one 50/50 claim+split cycle
 npm run loop       # cycle every CYCLE_MINUTES, forever
-npm run status     # bucket balances + lifetime stats
 npm test           # allocation math self-checks
 ```
+
+## The spam engine (`npm run spam`)
+
+Continuously claims creator fees and launches billboards, each from its own
+fresh dev wallet, **throttling the cadence down as the treasury drains**:
+
+- Bursts `SPAM_BURST_SIZE` (default 3) pairs at a time.
+- Full speed (`SPAM_MIN_INTERVAL_SEC`, default 5s) while the wallet can afford
+  ≥ `SPAM_FULL_SPEED_RUNWAY` more pairs; the interval then stretches toward
+  `SPAM_MAX_INTERVAL_SEC` (120s) as funds run low — e.g. 5s → 8s → 13s → 25s →
+  42s → 120s as runway shrinks 25 → 15 → 10 → 5 → 3 → 1.
+- Re-claims fees every `SPAM_CLAIM_EVERY_SEC` so the runway refills as pairs
+  (and the main coin) earn.
+- Stops when it runs out of spendable SOL (keeping `RESERVE_SOL` untouched).
+
+```bash
+npm run spam                 # run until out of funds (Ctrl-C to stop)
+npm run spam -- --max 10     # bounded run — launch 10 then stop (great for testing)
+npm run sweep                # reclaim leftover SOL from every used dev wallet
+```
+
+`npm run status` is the management view — treasury balance, claimable fees,
+runway (# pairs affordable), the current cadence at this balance, lifetime
+launches, and how many dev wallets are pending sweep.
+
+### Metadata (no Pinata required)
+
+Set **`SPAM_METADATA_URI`** to any already-pinned metadata JSON and the engine
+reuses it for every launch with no IPFS key at all — easiest is to point it at
+your official $BULLPOST coin's own metadata URI, so the billboards show the real
+logo. (Alternatively set `PINATA_JWT` and it pins the logo itself.)
 
 **`DRY_RUN=true` is the default.** The bot logs exactly what it would claim,
 split, launch and send — but signs nothing. Flip to `false` only after a dry
@@ -109,14 +141,15 @@ pm2 start "npm run loop" --name bullpost-bot --cwd backend
 ## Module map
 
 ```
-src/index.ts     orchestrator + one-shot test commands
+src/index.ts     orchestrator, spam engine dispatch, management view, test cmds
+src/engine.ts    throttled spam engine (burst + auto-slowdown loop)
 src/claim.ts     creator-fee claim via @pump-fun/pump-sdk (+ WSOL unwrap)
 src/split.ts     integer 50/50 allocation math (tested)
 src/spam.ts      billboard launches from fresh per-pair dev wallets
 src/keystore.ts  persists the dev wallets (state/dev-wallets.json)
-src/sweep.ts     reclaims leftover SOL + fees from used dev wallets
+src/sweep.ts     drains used dev wallets back to the treasury
 src/payroll.ts   SOL transfer to the bagworker wallet
-src/rpc.ts       simulate / priority-fee / rebroadcast transaction landing
+src/rpc.ts       simulate / confirm-by-signature / drain transaction landing
 src/state.ts     persistent buckets + ledger
 ```
 

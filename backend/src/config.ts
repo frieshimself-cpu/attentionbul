@@ -59,11 +59,21 @@ export const config = {
   spamTokenName: envStr('SPAM_TOKEN_NAME', '$BULLPOST'),
   spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'BULLPOST'),
   pinataJwt: process.env.PINATA_JWT ?? '',
+  // If set, reuse this already-pinned metadata URI for every launch instead of
+  // pinning fresh via Pinata. Lets the engine run with no Pinata key at all.
+  spamMetadataUri: process.env.SPAM_METADATA_URI ?? '',
   officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://bullpost.fun'),
   officialTwitter: process.env.OFFICIAL_TWITTER ?? '',
   officialTelegram: process.env.OFFICIAL_TELEGRAM ?? '',
 
   slippageBps: envNum('SLIPPAGE_BPS', 300),
+
+  // ---- throttled spam engine ----
+  spamBurstSize: envNum('SPAM_BURST_SIZE', 3),
+  spamMinIntervalSec: envNum('SPAM_MIN_INTERVAL_SEC', 5),
+  spamMaxIntervalSec: envNum('SPAM_MAX_INTERVAL_SEC', 120),
+  spamFullSpeedRunway: envNum('SPAM_FULL_SPEED_RUNWAY', 25),
+  spamClaimEverySec: envNum('SPAM_CLAIM_EVERY_SEC', 300),
 } as const;
 
 /**

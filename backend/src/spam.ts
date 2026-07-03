@@ -55,11 +55,14 @@ async function pinToIpfs(body: Blob, filename: string): Promise<string> {
 }
 
 /**
- * Metadata is identical for every billboard launch, so we pin the image and
- * JSON once and cache the URI in state. (pump.fun's own /api/ipfs endpoint
- * is discontinued — metadata must be pinned via your own IPFS provider.)
+ * Metadata is identical for every billboard launch. Resolution order:
+ *   1. SPAM_METADATA_URI env — reuse an already-pinned URI (no Pinata needed).
+ *   2. a URI we pinned on a previous run (cached in state).
+ *   3. pin the image + JSON fresh via Pinata (needs PINATA_JWT).
+ * (pump.fun's own /api/ipfs endpoint is discontinued.)
  */
 async function getMetadataUri(state: BotState): Promise<string> {
+  if (config.spamMetadataUri) return config.spamMetadataUri;
   if (state.spamMetadataUri) return state.spamMetadataUri;
 
   const imagePath = path.resolve(backendDir, config.spamImagePath);
