@@ -8,6 +8,10 @@
     "cycle": "tsx src/index.ts",
     "loop": "tsx src/index.ts --loop",
     "status": "tsx src/index.ts --status",
+    "claimable": "tsx src/index.ts --claimable",
+    "claim": "tsx src/index.ts --claim",
+    "launch-one": "tsx src/index.ts --launch-one",
+    "sweep": "tsx src/index.ts --sweep",
     "test": "tsx test/split.test.ts",
     "typecheck": "tsc --noEmit"
   },

@@ -1,21 +1,30 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Keypair } from '@solana/web3.js';
+import { Keypair, SystemProgram } from '@solana/web3.js';
+import bs58 from 'bs58';
 import { config, solToLamports, lamportsToSol } from './config.js';
-import { sendSerializedTx } from './rpc.js';
+import { sendSerializedTx, sendInstructions } from './rpc.js';
 import { log, ledger } from './log.js';
 import { BotState, saveState } from './state.js';
+import { upsertDevWallet } from './keystore.js';
 
 const backendDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUMPPORTAL = 'https://pumpportal.fun/api/trade-local';
 
-/** Rent + network/priority fees for the create tx itself (mint + curve + metadata). */
-export const LAUNCH_OVERHEAD_LAMPORTS = solToLamports(0.025);
+/** Rent (~0.0107 SOL, measured) for the create tx's mint + curve + metadata accounts. */
+export const LAUNCH_OVERHEAD_LAMPORTS = solToLamports(0.011);
 
-/** Total a single billboard costs: create overhead plus the optional dev buy. */
+/**
+ * Buffer funded to each fresh dev wallet on top of rent + dev buy, to cover
+ * its own tx fees, priority fees, and the 0.5% PumpPortal fee on any dev buy.
+ * Leftover is recoverable via `--sweep`.
+ */
+export const DEV_WALLET_BUFFER_LAMPORTS = solToLamports(0.002);
+
+/** SOL the treasury funds into the fresh dev wallet for one billboard. */
 export function launchCostLamports(): bigint {
-  return LAUNCH_OVERHEAD_LAMPORTS + solToLamports(Math.max(0, config.spamDevBuySol));
+  return LAUNCH_OVERHEAD_LAMPORTS + DEV_WALLET_BUFFER_LAMPORTS + solToLamports(Math.max(0, config.spamDevBuySol));
 }
 
 async function pumpPortalTx(body: Record<string, unknown>, label: string): Promise<Uint8Array> {
@@ -86,29 +95,58 @@ async function getMetadataUri(state: BotState): Promise<string> {
  * Launch one $BULLPOST billboard on pump.fun via PumpPortal's local
  * (self-sign) API, returning the new mint address.
  *
+ * Each billboard is created by its OWN fresh dev wallet (not the treasury) so
+ * the pairs aren't all traceable to one creator. The treasury funds that dev
+ * wallet with exactly the launch cost, the dev wallet creates the pair, and
+ * its key is saved to the keystore so leftover SOL / any fees it earns stay
+ * recoverable via `--sweep`.
+ *
  * The token is created with NO dev buy: PumpPortal's trade-local currently
  * rejects an atomic create+buy (verified — every nonzero `amount` 400s),
- * while create-only succeeds. If SPAM_DEV_BUY_SOL > 0 we seed the curve with
- * a SEPARATE buy after the create confirms; a failed dev buy doesn't fail the
- * launch (the billboard is already live). Creation is free; the 0.5%
- * PumpPortal fee applies only to the dev buy.
+ * while create-only succeeds. If SPAM_DEV_BUY_SOL > 0 the dev wallet seeds the
+ * curve with a SEPARATE buy after the create confirms; a failed dev buy
+ * doesn't fail the launch (the billboard is already live).
  */
-export async function launchSpamPair(creator: Keypair, state: BotState): Promise<string | null> {
+export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<string | null> {
+  const funding = launchCostLamports();
+
   if (config.dryRun) {
-    log(`spam: would launch billboard #${state.spamLaunchCount + 1}` +
+    log(`spam: would generate a fresh dev wallet, fund it ${lamportsToSol(funding).toFixed(4)} SOL, ` +
+      `and launch billboard #${state.spamLaunchCount + 1}` +
       (config.spamDevBuySol > 0 ? ` + ${config.spamDevBuySol} SOL dev buy` : ' (create-only)'));
-    ledger({ action: 'spamLaunch', dryRun: true, devBuySol: config.spamDevBuySol });
+    ledger({ action: 'spamLaunch', dryRun: true, funding: funding.toString(), devBuySol: config.spamDevBuySol });
     return null;
   }
 
   const uri = await getMetadataUri(state);
+
+  // 1. Fresh dev wallet for this billboard. Persist the key BEFORE funding so
+  //    a crash mid-launch can never lose access to the SOL we're about to send.
+  const dev = Keypair.generate();
+  const devPk = dev.publicKey.toBase58();
+  upsertDevWallet({
+    ts: new Date().toISOString(),
+    pubkey: devPk,
+    secret: bs58.encode(dev.secretKey),
+    fundedLamports: funding.toString(),
+    status: 'funded',
+  });
+
+  // 2. Fund the dev wallet from the treasury.
+  const fundSig = await sendInstructions(
+    [SystemProgram.transfer({ fromPubkey: treasury.publicKey, toPubkey: dev.publicKey, lamports: funding })],
+    treasury,
+    [],
+    'fund-dev-wallet'
+  );
+  log(`spam: funded fresh dev wallet ${devPk} with ${lamportsToSol(funding).toFixed(4)} SOL (tx ${fundSig})`);
+
+  // 3. The dev wallet creates the billboard (dev wallet + mint co-sign).
   const mintKeypair = Keypair.generate();
   const mint = mintKeypair.publicKey.toBase58();
-
-  // 1. Create the billboard (mint co-signs). Verified-working shape: amount 0.
   const createTx = await pumpPortalTx(
     {
-      publicKey: creator.publicKey.toBase58(),
+      publicKey: devPk, // this fresh wallet is the pair's creator
       action: 'create',
       tokenMetadata: { name: config.spamTokenName, symbol: config.spamTokenSymbol, uri },
       mint,
@@ -120,19 +158,20 @@ export async function launchSpamPair(creator: Keypair, state: BotState): Promise
     },
     'create'
   );
-  const sig = await sendSerializedTx(createTx, [mintKeypair, creator], 'spam-launch');
+  const sig = await sendSerializedTx(createTx, [mintKeypair, dev], 'spam-launch');
 
   state.spamLaunchCount += 1;
   saveState(state);
+  upsertDevWallet({ ts: new Date().toISOString(), pubkey: devPk, secret: bs58.encode(dev.secretKey), fundedLamports: funding.toString(), mint, status: 'launched' });
   log(`spam: billboard #${state.spamLaunchCount} live at ${mint} — https://pump.fun/coin/${mint}`);
-  ledger({ action: 'spamLaunch', mint, launchNumber: state.spamLaunchCount, sig });
+  ledger({ action: 'spamLaunch', mint, devWallet: devPk, launchNumber: state.spamLaunchCount, sig });
 
-  // 2. Optional separate dev buy to seed the curve.
+  // 4. Optional separate dev buy (from the same fresh wallet) to seed the curve.
   if (config.spamDevBuySol > 0) {
     try {
       const buyTx = await pumpPortalTx(
         {
-          publicKey: creator.publicKey.toBase58(),
+          publicKey: devPk,
           action: 'buy',
           mint,
           denominatedInSol: 'true',
@@ -143,12 +182,12 @@ export async function launchSpamPair(creator: Keypair, state: BotState): Promise
         },
         'dev-buy'
       );
-      const buySig = await sendSerializedTx(buyTx, [creator], 'spam-dev-buy');
+      const buySig = await sendSerializedTx(buyTx, [dev], 'spam-dev-buy');
       log(`spam: seeded #${state.spamLaunchCount} with ${config.spamDevBuySol} SOL (tx ${buySig})`);
-      ledger({ action: 'spamDevBuy', mint, devBuySol: config.spamDevBuySol, sig: buySig });
+      ledger({ action: 'spamDevBuy', mint, devWallet: devPk, devBuySol: config.spamDevBuySol, sig: buySig });
     } catch (err) {
       log(`spam: dev buy for ${mint} failed (billboard still live): ${(err as Error).message}`);
-      ledger({ action: 'spamDevBuyFailed', mint, error: (err as Error).message });
+      ledger({ action: 'spamDevBuyFailed', mint, devWallet: devPk, error: (err as Error).message });
     }
   }
 

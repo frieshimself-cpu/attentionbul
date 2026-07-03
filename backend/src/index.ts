@@ -4,9 +4,10 @@ import { loadKeypair } from './wallet.js';
 import { splitLamports } from './split.js';
 import { loadState, saveState, getBucket, creditBuckets, debitBucket, BotState } from './state.js';
 import { connection } from './rpc.js';
-import { claimRewards } from './claim.js';
+import { claimRewards, getClaimable } from './claim.js';
 import { payBagworkers } from './payroll.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
+import { sweepDevWallets } from './sweep.js';
 import { log, ledger } from './log.js';
 
 const MIN_PAYROLL_LAMPORTS = solToLamports(0.01);
@@ -19,9 +20,8 @@ async function spendable(creator: Keypair): Promise<bigint> {
 
 async function runCycle(creator: Keypair, state: BotState): Promise<void> {
   log(`===== cycle start${config.dryRun ? ' (DRY RUN — nothing will be sent)' : ''} =====`);
-  log(`wallet: ${creator.publicKey.toBase58()}`);
 
-  // 1. Claim creator rewards and credit the buckets 50/25/25.
+  // 1. Claim creator rewards and credit the buckets 50/50.
   const claimed = await claimRewards(creator);
   if (claimed >= config.minCycleLamports) {
     const split = splitLamports(claimed);
@@ -121,6 +121,53 @@ async function main(): Promise<void> {
 
   validateLiveConfig();
   const creator = loadKeypair(config.creatorWalletSecret);
+  log(`wallet: ${creator.publicKey.toBase58()}`);
+
+  // ---- test commands (each does ONE thing, so you can prove a path in isolation) ----
+
+  // Read-only: how much creator fee is claimable right now. Never signs anything.
+  if (args.includes('--claimable')) {
+    const claimable = await getClaimable(creator);
+    log(`claimable creator fees: ${lamportsToSol(claimable).toFixed(6)} SOL (bonding-curve + PumpSwap vaults)`);
+    if (claimable === 0n) {
+      log('nothing to claim yet — a coin this wallet created needs some trading volume first.');
+    }
+    return;
+  }
+
+  // Claim creator fees only (no split, no spam). Honors DRY_RUN.
+  if (args.includes('--claim')) {
+    const gained = await claimRewards(creator);
+    log(gained > 0n
+      ? `claim complete: ${lamportsToSol(gained).toFixed(6)} SOL landed in the wallet`
+      : 'claim: nothing was claimable.');
+    return;
+  }
+
+  // Launch exactly ONE billboard pair (no claim, no buckets). Honors DRY_RUN.
+  // The cheapest real end-to-end test of the spam path (~0.013 SOL live).
+  if (args.includes('--launch-one')) {
+    const before = BigInt(await connection.getBalance(creator.publicKey, 'confirmed'));
+    log(`treasury balance before: ${lamportsToSol(before).toFixed(4)} SOL`);
+    if (!config.dryRun && before < launchCostLamports() + config.reserveLamports) {
+      log(`insufficient balance — need ~${lamportsToSol(launchCostLamports() + config.reserveLamports).toFixed(4)} SOL (launch cost + reserve). Fund the wallet and retry.`);
+      return;
+    }
+    const mint = await launchSpamPair(creator, state);
+    if (!config.dryRun && mint) {
+      const after = BigInt(await connection.getBalance(creator.publicKey, 'confirmed'));
+      log(`treasury balance after: ${lamportsToSol(after).toFixed(4)} SOL (spent ${lamportsToSol(before - after).toFixed(4)} SOL)`);
+      log(`view it: https://pump.fun/coin/${mint}  |  https://solscan.io/token/${mint}`);
+      log('reclaim the dev wallet\'s leftover SOL any time with:  npm run sweep');
+    }
+    return;
+  }
+
+  // Reclaim leftover SOL (and any fees) from used dev wallets back to treasury.
+  if (args.includes('--sweep')) {
+    await sweepDevWallets(creator);
+    return;
+  }
 
   if (args.includes('--loop')) {
     log(`looping every ${config.cycleMinutes} minutes (Ctrl-C to stop)`);
