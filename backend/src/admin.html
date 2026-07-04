@@ -107,14 +107,18 @@
 const $ = (id) => document.getElementById(id);
 let dragging = false; // don't clobber sliders mid-drag with poll updates
 
+const KEY = new URLSearchParams(location.search).get('key') || '';
+const withKey = (p) => p + (p.includes('?') ? '&' : '?') + 'key=' + encodeURIComponent(KEY);
+
 async function post(patch){
-  const r = await fetch('/api/control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
+  const r = await fetch(withKey('/api/control'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
   return r.json();
 }
 async function poll(){
   try{
-    const s = await fetch('/api/status').then(r=>r.json());
-    render(s);
+    const r = await fetch(withKey('/api/status'));
+    if(r.status===401){ $('banner').textContent='🔒 wrong or missing key — open /admin?key=YOUR_KEY'; return; }
+    render(await r.json());
   }catch(e){ $('banner').textContent='disconnected — is the panel process running?'; }
 }
 

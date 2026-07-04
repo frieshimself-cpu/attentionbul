@@ -14,12 +14,21 @@ import { loadDevWallets } from './keystore.js';
 import { log } from './log.js';
 
 const PORT = Number(process.env.PANEL_PORT ?? 8080);
-// Bind to localhost by default — the panel controls real funds and has no auth,
-// so it must NOT be exposed on a public interface. To reach it on a VPS, tunnel:
-//   ssh -L 8080:localhost:8080 you@your-vps
-// Only set PANEL_HOST=0.0.0.0 if you've put auth/a firewall in front of it.
+// Bind to localhost unless PANEL_HOST is set. If exposed publicly (0.0.0.0),
+// PANEL_TOKEN MUST be set — every route requires ?key=<token> and the panel
+// lives at /admin?key=<token>. No token + public host would be wide open.
 const HOST = process.env.PANEL_HOST ?? '127.0.0.1';
+const TOKEN = process.env.PANEL_TOKEN ?? '';
 const ADMIN_HTML = path.join(path.dirname(fileURLToPath(import.meta.url)), 'admin.html');
+
+if (HOST !== '127.0.0.1' && !TOKEN) {
+  throw new Error('PANEL_HOST is public but PANEL_TOKEN is empty — refusing to start an unprotected panel.');
+}
+
+function authed(url: URL, req: http.IncomingMessage): boolean {
+  if (!TOKEN) return true; // localhost dev, no token
+  return url.searchParams.get('key') === TOKEN || req.headers['x-panel-key'] === TOKEN;
+}
 
 validateLiveConfig();
 const creator = loadKeypair(config.creatorWalletSecret);
@@ -97,7 +106,13 @@ const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url ?? '/', `http://localhost:${PORT}`);
 
-    if (req.method === 'GET' && url.pathname === '/') {
+    // Everything requires the key when a token is configured.
+    if (!authed(url, req)) {
+      res.writeHead(401, { 'Content-Type': 'text/plain' });
+      return res.end('unauthorized — append ?key=YOUR_KEY to the URL');
+    }
+
+    if (req.method === 'GET' && (url.pathname === '/admin' || url.pathname === '/')) {
       const html = fs.readFileSync(ADMIN_HTML, 'utf8');
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       return res.end(html);
