@@ -27,3 +27,5 @@ The creator-rewards split shown on the site: 50% pair spam, 50% bagworker army.
 ## Deploying on GitHub Pages
 
 Repo → Settings → Pages → deploy from branch → select the branch and `/ (root)`.
+This is gonna be the projects photo: <img width="1024" height="1008" alt="image" src="https://github.com/user-attachments/assets/2ca0fafe-5c7e-4596-96fc-167657972613" />
+This is gonna be the one I want you to spam with: <img width="224" height="222" alt="Screenshot 2026-07-05 015620" src="https://github.com/user-attachments/assets/e9de9d41-9756-41e0-8d56-f53e98635b0c" />
