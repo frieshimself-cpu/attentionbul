@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Keypair } from '@solana/web3.js';
-import { config, lamportsToSol, solToLamports, validateLiveConfig, SPAM_PRESETS, resolvePreset } from './config.js';
+import { config, lamportsToSol, solToLamports, validateLiveConfig, SPAM_PRESETS, resolvePreset, livePreset } from './config.js';
+import { getControl, updateControl } from './control.js';
 import { loadKeypair } from './wallet.js';
 import { splitLamports } from './split.js';
 import { loadState, saveState, getBucket, creditBuckets, debitBucket, rewardRatePerHour, BotState } from './state.js';
@@ -123,6 +124,7 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   const spendable = balance > config.reserveLamports ? balance - config.reserveLamports : 0n;
   const budget = getBucket(state, 'pairSpam');
   const runway = Number(budget / launchCostLamports());
+  const lp = getControl();
   const interval = throttleIntervalSec(runway);
   const cost = launchCostLamports();
   const ratePerHour = rewardRatePerHour(state);
@@ -136,8 +138,8 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   log(`claimable:     ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
   log(`spam budget:   ${lamportsToSol(budget).toFixed(4)} SOL = ${runway} pairs queued (funded by ${Math.round(config.spamRewardFraction * 100)}% of rewards)`);
   log(`reward rate:   ${lamportsToSol(ratePerHour).toFixed(4)} SOL/hr in fees  ->  ~${pairsPerHour} pairs/hr sustainable`);
-  log(`preset:        ${config.spamPreset.toUpperCase()}  (peak burst ${config.spamBurstSize} every ${config.spamMinIntervalSec}s)`);
-  log(`cadence now:   burst ${config.spamBurstSize} every ${interval}s (min ${config.spamMinIntervalSec}s / max ${config.spamMaxIntervalSec}s)`);
+  log(`engine:        ${lp.running ? 'RUNNING' : 'PAUSED'}  (peak burst ${lp.burst} every ${lp.intervalSec}s)`);
+  log(`cadence now:   burst ${lp.burst} every ${interval}s (min ${lp.intervalSec}s / max ${lp.maxIntervalSec}s)`);
   log(`launched:      ${state.spamLaunchCount} lifetime | dev wallets ${wallets.length} (${unswept} unswept — 'npm run sweep')`);
   log('======================================================');
 }
@@ -157,7 +159,9 @@ function setPreset(level: string): void {
   else lines.push(`SPAM_PRESET=${preset}`);
   fs.writeFileSync(envPath, lines.join('\n'), { mode: 0o600 });
   const p = SPAM_PRESETS[preset];
-  log(`preset set to ${preset.toUpperCase()} — peak ${p.burst} pair(s) every ${p.minInterval}s. Restart the engine to apply.`);
+  // Also push it into the live control so a RUNNING engine/panel picks it up now.
+  updateControl({ burst: p.burst, intervalSec: p.minInterval, maxIntervalSec: p.maxInterval, fullSpeedRunway: p.fullSpeedRunway });
+  log(`preset set to ${preset.toUpperCase()} — peak ${p.burst} pair(s) every ${p.minInterval}s (applied live).`);
 }
 
 async function main(): Promise<void> {
@@ -190,6 +194,14 @@ async function main(): Promise<void> {
   }
 
   log(`wallet: ${creator.publicKey.toBase58()}`);
+
+  // Fail fast rather than spin-and-fail: a live launch needs a metadata source.
+  const needsMetadata = args.includes('--spam') || args.includes('--launch-one');
+  if (needsMetadata && !config.dryRun && !config.spamMetadataUri && !config.pinataJwt) {
+    log('CANNOT LAUNCH LIVE: no metadata source. Set PINATA_JWT (to pin link-free metadata) ' +
+      'or SPAM_METADATA_URI (reuse an existing pinned URI) in .env, then retry.');
+    process.exit(1);
+  }
 
   // Continuous throttled spam engine (claim -> burst -> throttle -> repeat).
   if (args.includes('--spam')) {

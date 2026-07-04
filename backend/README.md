@@ -44,11 +44,34 @@ You need:
 ## Running
 
 ```bash
-npm run spam       # THROTTLED SPAM ENGINE: claim -> burst -> throttle -> repeat
-npm run status     # live management view (balance, claimable, runway, cadence)
-npm run cycle      # one 50/50 claim+split cycle
-npm run loop       # cycle every CYCLE_MINUTES, forever
+npm run panel      # ADMIN PANEL: web dashboard to run + steer the engine (recommended)
+npm run spam       # headless engine (same engine, no UI): claim -> burst -> throttle
+npm run status     # one-shot status in the terminal
+npm run sweep      # reclaim leftover SOL from used dev wallets
 npm test           # allocation math self-checks
+```
+
+## Admin panel (`npm run panel`)
+
+The easiest way to run and control everything. Starts the engine (paused) and a
+web dashboard at **http://localhost:8080**:
+
+- **START / STOP** the engine
+- **Speed** slider (seconds between bursts) and **Amount** slider (pairs per
+  burst), plus one-tap **Low / Medium / High** presets
+- Live stats: balance, spam budget + runway, claimable fees, reward rate,
+  launches, cost/pair, current cadence
+- Recent launches with pump.fun links
+- A clear **DRY RUN / LIVE** banner
+
+Every change applies to the running engine within ~1–2 seconds — no restart. So
+when the coin is live you can dial speed up or down on the fly.
+
+The panel binds to **localhost only** (it controls real funds and has no auth).
+On a VPS, reach it through an SSH tunnel:
+
+```bash
+ssh -L 8080:localhost:8080 you@your-vps   # then open http://localhost:8080
 ```
 
 ## The spam engine (`npm run spam`) — paced by creator rewards

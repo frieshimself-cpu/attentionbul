@@ -49,9 +49,14 @@ export async function getClaimable(creator: Keypair): Promise<bigint> {
  * Claim creator rewards. PumpSwap-side fees arrive as wrapped SOL, so after
  * claiming we close the WSOL token account to unwrap everything to native SOL.
  * Returns the actual SOL gained (measured by wallet balance delta, net of fees).
+ *
+ * @param minLamports skip the claim (return 0) unless at least this much is
+ *   claimable — so autoclaiming every 5s never spends more in fees than it
+ *   collects. Defaults to the configured floor; pass 0n to force a claim.
  */
-export async function claimRewards(creator: Keypair): Promise<bigint> {
+export async function claimRewards(creator: Keypair, minLamports = config.minClaimLamports): Promise<bigint> {
   const claimable = await getClaimable(creator);
+  if (claimable < minLamports) return 0n; // below the worth-claiming floor — don't send a dust tx
   log(`claim: ${lamportsToSol(claimable).toFixed(6)} SOL claimable across both vaults`);
   if (claimable <= 0n) return 0n;
 

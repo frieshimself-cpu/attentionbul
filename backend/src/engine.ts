@@ -3,6 +3,7 @@ import { config, lamportsToSol } from './config.js';
 import { connection } from './rpc.js';
 import { claimRewards } from './claim.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
+import { getControl, ControlState } from './control.js';
 import {
   BotState,
   saveState,
@@ -27,20 +28,32 @@ function budgetRunway(state: BotState): number {
 }
 
 /**
- * Seconds to wait after a burst. Full speed while the reward budget is deep,
- * stretching toward the max as it drains — so the cadence tracks how fast fees
- * are coming in: rich rewards keep the budget deep (fast), thin rewards let it
- * drain (slow).
+ * Seconds to wait after a burst. Full speed (control.intervalSec) while the
+ * budget is deep; stretches toward control.maxIntervalSec as it drains — so the
+ * cadence tracks earnings. Reads the LIVE control each call.
  */
-export function throttleIntervalSec(runway: number): number {
-  if (runway >= config.spamFullSpeedRunway) return config.spamMinIntervalSec;
-  const scaled = config.spamMinIntervalSec * (config.spamFullSpeedRunway / Math.max(runway, 1));
-  return Math.min(Math.round(scaled), config.spamMaxIntervalSec);
+export function throttleIntervalSec(runway: number, c: ControlState = getControl()): number {
+  if (runway >= c.fullSpeedRunway) return c.intervalSec;
+  const scaled = c.intervalSec * (c.fullSpeedRunway / Math.max(runway, 1));
+  return Math.min(Math.round(scaled), c.maxIntervalSec);
 }
 
-/** Claim fees and route the configured fraction into the spam budget. */
+/** Sleep, waking early (within ~1s) if the panel changed speed/burst or paused. */
+async function interruptibleSleep(totalSec: number): Promise<void> {
+  const snap = getControl();
+  const key = `${snap.running}|${snap.burst}|${snap.intervalSec}|${snap.maxIntervalSec}|${snap.fullSpeedRunway}`;
+  let remaining = totalSec * 1000;
+  while (remaining > 0) {
+    await sleep(Math.min(1000, remaining));
+    remaining -= 1000;
+    const c = getControl();
+    if (`${c.running}|${c.burst}|${c.intervalSec}|${c.maxIntervalSec}|${c.fullSpeedRunway}` !== key) return;
+  }
+}
+
+/** Claim fees (only past the worth-claiming floor) and add the configured fraction to the spam budget. */
 async function claimIntoBudget(treasury: Keypair, state: BotState): Promise<bigint> {
-  const claimed = await claimRewards(treasury);
+  const claimed = await claimRewards(treasury); // returns 0 unless >= MIN_CLAIM_SOL
   if (claimed > 0n) {
     const toSpam = BigInt(Math.floor(Number(claimed) * config.spamRewardFraction));
     creditBuckets(state, { pairSpam: toSpam, bagworkers: claimed - toSpam });
@@ -53,25 +66,29 @@ async function claimIntoBudget(treasury: Keypair, state: BotState): Promise<bigi
 }
 
 /**
- * Rewards-paced spam engine. The spam is funded ONLY by claimed creator fees
- * (an optional one-time SPAM_SEED_SOL can bootstrap it from principal), so the
- * launch rate automatically tracks the earning rate: claim -> fill budget ->
- * burst while the budget is deep -> slow as it drains -> pause for the next
- * claim when it's empty. Principal below RESERVE_SOL is never touched.
+ * Rewards-paced spam engine, steered live by the admin panel's control state
+ * (running / burst / intervalSec / …). Funded only by claimed fees (optional
+ * SPAM_SEED_SOL bootstraps a fast start), so the launch rate tracks earnings.
+ * Resilient: transient RPC errors are logged and retried, never fatal.
  *
- * @param maxLaunches optional hard cap (used for bounded test runs).
+ * @param maxLaunches optional hard cap (bounded test runs).
+ * @param autostart if true, force running=true at startup (CLI `npm run spam`).
  */
 export async function runSpamEngine(
   treasury: Keypair,
   state: BotState,
-  maxLaunches?: number
+  maxLaunches?: number,
+  autostart = true
 ): Promise<void> {
-  log(`spam engine starting${config.dryRun ? ' (DRY RUN)' : ''} — burst ${config.spamBurstSize}, ` +
-    `${lamportsToSol(launchCostLamports()).toFixed(4)} SOL/pair, funded by ` +
-    `${Math.round(config.spamRewardFraction * 100)}% of creator rewards` +
-    (maxLaunches ? `, capped at ${maxLaunches} launches` : ''));
+  const capped = typeof maxLaunches === 'number' && maxLaunches >= 0;
+  const c0 = getControl();
+  if (autostart && !c0.running) c0.running = true;
 
-  // Optional one-time bootstrap from principal.
+  log(`spam engine live${config.dryRun ? ' (DRY RUN)' : ''} — ${lamportsToSol(launchCostLamports()).toFixed(4)} SOL/pair, ` +
+    `funded by ${Math.round(config.spamRewardFraction * 100)}% of creator rewards` +
+    (capped ? `, capped at ${maxLaunches} launches` : '') + '. Steer it from the admin panel.');
+
+  // Optional one-time bootstrap from principal for a fast start.
   if (config.spamSeedLamports > 0n && !state.spamSeeded) {
     creditBuckets(state, { pairSpam: config.spamSeedLamports, bagworkers: 0n });
     state.spamSeeded = true;
@@ -79,61 +96,62 @@ export async function runSpamEngine(
     log(`engine: seeded spam budget with ${lamportsToSol(config.spamSeedLamports).toFixed(4)} SOL from principal`);
   }
 
-  await claimIntoBudget(treasury, state);
-  let lastClaim = Date.now();
+  let lastClaim = 0;
   let launched = 0;
 
   for (;;) {
-    // Refill the budget on a timer.
-    if (Date.now() - lastClaim > config.spamClaimEverySec * 1000) {
-      await claimIntoBudget(treasury, state);
-      lastClaim = Date.now();
-    }
+    try {
+      const c = getControl();
+      if (!c.running) { await sleep(1000); continue; } // paused from the panel
 
-    let runway = budgetRunway(state);
-    const walletOk = (await spendableLamports(treasury)) >= launchCostLamports();
+      if (Date.now() - lastClaim > c.claimEverySec * 1000) {
+        await claimIntoBudget(treasury, state);
+        lastClaim = Date.now();
+      }
 
-    // Out of reward budget (or wallet reserve) — claim once, else idle-wait.
-    if (runway < 1 || !walletOk) {
-      await claimIntoBudget(treasury, state);
-      lastClaim = Date.now();
-      runway = budgetRunway(state);
-      if (runway < 1 || (await spendableLamports(treasury)) < launchCostLamports()) {
-        if (maxLaunches) { log('engine: reward budget empty — stopping (capped run).'); break; }
-        log(`engine: reward budget empty (${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL) — ` +
-          `waiting ${config.spamMaxIntervalSec}s for more creator fees...`);
-        await sleep(config.spamMaxIntervalSec * 1000);
+      const runway = budgetRunway(state);
+      const spendable = await spendableLamports(treasury);
+
+      if (runway < 1 || spendable < launchCostLamports()) {
+        if (capped) { log('engine: reward budget empty — stopping (capped run).'); break; }
+        log(`engine: budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL / spendable ` +
+          `${lamportsToSol(spendable).toFixed(4)} SOL — waiting for creator fees...`);
+        await interruptibleSleep(Math.min(c.maxIntervalSec, c.claimEverySec));
         continue;
       }
-    }
 
-    let burst = Math.min(config.spamBurstSize, runway);
-    if (maxLaunches) burst = Math.min(burst, maxLaunches - launched);
-    const intervalSec = throttleIntervalSec(runway);
+      let burst = Math.min(c.burst, runway);
+      if (capped) burst = Math.min(burst, maxLaunches! - launched);
+      const intervalSec = throttleIntervalSec(runway, c);
+      log(`engine: bursting ${burst} (budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL = ${runway} pairs, next in ${intervalSec}s)`);
 
-    log(`engine: bursting ${burst} (budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL = ` +
-      `${runway} pairs, next in ${intervalSec}s)`);
-
-    for (let i = 0; i < burst; i++) {
-      // Debit the budget before spending so a crash can't double-spend it.
-      if (!config.dryRun) { debitBucket(state, 'pairSpam', launchCostLamports()); saveState(state); }
-      try {
-        await launchSpamPair(treasury, state);
-        launched++;
-      } catch (err) {
-        log(`engine: launch failed: ${(err as Error).message} — refunding budget`);
-        if (!config.dryRun) { creditBuckets(state, { pairSpam: launchCostLamports(), bagworkers: 0n }); saveState(state); }
-        ledger({ action: 'engineLaunchError', error: (err as Error).message });
+      for (let i = 0; i < burst; i++) {
+        if (!getControl().running) break; // paused mid-burst
+        if (!config.dryRun && (await spendableLamports(treasury)) < launchCostLamports()) {
+          log('engine: hit reserve floor mid-burst — pausing launches.');
+          break;
+        }
+        if (!config.dryRun) { debitBucket(state, 'pairSpam', launchCostLamports()); saveState(state); }
+        try {
+          await launchSpamPair(treasury, state);
+          launched++;
+        } catch (err) {
+          const funded = (err as Error & { funded?: boolean }).funded;
+          if (!config.dryRun && !funded) { creditBuckets(state, { pairSpam: launchCostLamports(), bagworkers: 0n }); saveState(state); }
+          log(`engine: launch failed${funded ? ' after funding (recover via sweep)' : ' (budget refunded)'}: ${(err as Error).message}`);
+          ledger({ action: 'engineLaunchError', funded: !!funded, error: (err as Error).message });
+        }
+        if (capped && launched >= maxLaunches!) break;
       }
-      if (maxLaunches && launched >= maxLaunches) break;
-    }
 
-    if (maxLaunches && launched >= maxLaunches) {
-      log(`engine: reached launch cap (${launched}) — stopping.`);
-      break;
-    }
+      if (capped && launched >= maxLaunches!) { log(`engine: reached launch cap (${launched}) — stopping.`); break; }
 
-    await sleep(intervalSec * 1000);
+      await interruptibleSleep(intervalSec);
+    } catch (err) {
+      log(`engine: transient error, retrying in 5s: ${(err as Error).message}`);
+      ledger({ action: 'engineError', error: (err as Error).message });
+      await sleep(5000);
+    }
   }
 
   log(`spam engine stopped after ${launched} launch(es) this run.`);

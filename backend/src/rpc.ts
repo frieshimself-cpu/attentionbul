@@ -100,6 +100,15 @@ export async function sendInstructions(
     const sig = await connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 });
 
     if (await confirmBySignature(raw, sig, label)) return sig;
+
+    // Before rebuilding with a fresh blockhash, make sure the prior attempt
+    // didn't actually land — rebuilding a duplicate could double-spend
+    // (e.g. double-fund a dev wallet). The old blockhash is ~expired by now.
+    const st = (await connection.getSignatureStatuses([sig])).value[0];
+    if (st && !st.err && (st.confirmationStatus === 'confirmed' || st.confirmationStatus === 'finalized')) {
+      log(`${label} landed on the prior attempt: ${sig}`);
+      return sig;
+    }
     log(`${label} not confirmed in ${CONFIRM_TIMEOUT_MS / 1000}s (attempt ${attempt}/2), rebuilding`);
   }
   throw new Error(`${label}: transaction not landed after 2 attempts`);
@@ -141,7 +150,7 @@ export async function drainAccount(from: Keypair, to: PublicKey, label = 'drain'
       recentBlockhash: blockhash,
       instructions: [
         // Fixed, tiny priority so the fee is deterministic and getFeeForMessage matches.
-        ComputeBudgetProgram.setComputeUnitLimit({ units: 450 }),
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 1000 }), // ample for a transfer
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1000 }),
         SystemProgram.transfer({ fromPubkey: from.publicKey, toPubkey: to, lamports }),
       ],

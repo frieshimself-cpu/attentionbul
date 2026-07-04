@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$BULLPOST — Engine Control</title>
+<style>
+  :root{--bg:#14100c;--card:#1f1913;--line:#3a2f24;--cream:#FFF3E2;--red:#E5484D;--green:#3fb950;--yellow:#FFC93C;--muted:#a99a86;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--cream);font:15px/1.5 'Nunito',system-ui,sans-serif;padding:18px;max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;letter-spacing:.02em}
+  h1 span{color:var(--red)}
+  .sub{color:var(--muted);font-size:.85rem;margin-top:2px}
+  .banner{margin:14px 0;padding:10px 14px;border-radius:12px;font-weight:800;text-align:center;border:2px solid}
+  .banner.dry{background:#123018;border-color:var(--green);color:#8ff0a4}
+  .banner.live{background:#3a1414;border-color:var(--red);color:#ff9a9a}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .stat .k{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+  .stat .v{font-size:1.35rem;font-weight:900;margin-top:4px}
+  .stat .v small{font-size:.8rem;color:var(--muted);font-weight:700}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}
+  .panel h2{font-size:1rem;margin-bottom:14px;color:var(--yellow)}
+  .startstop{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  button{font:inherit;font-weight:900;cursor:pointer;border:none;border-radius:12px;padding:12px 22px;transition:.12s transform}
+  button:active{transform:scale(.97)}
+  .btn-start{background:var(--green);color:#06210f;font-size:1.05rem;flex:1;min-width:160px}
+  .btn-stop{background:var(--red);color:#fff;font-size:1.05rem;flex:1;min-width:160px}
+  .state-badge{font-weight:900;padding:6px 14px;border-radius:999px;font-size:.85rem}
+  .state-badge.on{background:#123018;color:var(--green)}
+  .state-badge.off{background:#3a1414;color:#ff9a9a}
+  .ctrl{margin:16px 0}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:800;margin-bottom:6px}
+  .ctrl label b{color:var(--yellow)}
+  input[type=range]{width:100%;accent-color:var(--red)}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .presets button{flex:1;min-width:90px;background:#2a2119;color:var(--cream);border:1px solid var(--line);padding:10px}
+  .presets button.active{background:var(--red);color:#fff;border-color:var(--red)}
+  .hint{color:var(--muted);font-size:.8rem;margin-top:6px}
+  .adv{margin-top:10px}
+  .adv summary{cursor:pointer;color:var(--muted);font-weight:800;font-size:.85rem}
+  .adv .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0}
+  .adv input[type=number]{width:90px;background:#2a2119;border:1px solid var(--line);color:var(--cream);border-radius:8px;padding:8px;font:inherit}
+  .launches{list-style:none;max-height:280px;overflow:auto}
+  .launches li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+  .launches a{color:var(--yellow);text-decoration:none}
+  .launches .nm{font-weight:800}
+  .foot{color:var(--muted);font-size:.78rem;text-align:center;margin:20px 0 8px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .dot.on{background:var(--green)}.dot.off{background:var(--red)}
+</style>
+</head>
+<body>
+  <h1><span>$BULLPOST</span> · Engine Control</h1>
+  <div class="sub" id="treasury">—</div>
+  <div class="banner" id="banner">connecting…</div>
+
+  <div class="grid" id="stats"></div>
+
+  <div class="panel">
+    <div class="startstop">
+      <span class="state-badge off" id="stateBadge"><span class="dot off"></span>PAUSED</span>
+      <button class="btn-start" id="startBtn">▶ START</button>
+      <button class="btn-stop" id="stopBtn">⏸ STOP</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Speed &amp; Amount</h2>
+
+    <div class="presets" id="presets">
+      <button data-preset="low">🐢 Low<br><small>1 / 60s</small></button>
+      <button data-preset="medium">🚶 Medium<br><small>1 / 15s</small></button>
+      <button data-preset="high">🔥 High<br><small>2 / 5s</small></button>
+    </div>
+
+    <div class="ctrl">
+      <label>Pairs per burst (amount) <b id="burstVal">2</b></label>
+      <input type="range" id="burst" min="1" max="10" step="1" value="2">
+      <div class="hint">How many new pairs launch at once.</div>
+    </div>
+
+    <div class="ctrl">
+      <label>Seconds between bursts (speed) <b id="intervalVal">5s</b></label>
+      <input type="range" id="interval" min="1" max="120" step="1" value="5">
+      <div class="hint">Peak speed. The engine auto-slows below this as the reward budget drains.</div>
+    </div>
+
+    <div class="hint" id="rateSummary">—</div>
+
+    <details class="adv">
+      <summary>Advanced</summary>
+      <div class="row"><span>Slowest interval when budget is thin (s)</span><input type="number" id="maxIntervalSec" min="5" max="7200"></div>
+      <div class="row"><span>Full-speed while budget ≥ this many pairs</span><input type="number" id="fullSpeedRunway" min="1" max="1000"></div>
+      <div class="row"><span>Autoclaim every (s)</span><input type="number" id="claimEverySec" min="3" max="3600"></div>
+    </details>
+  </div>
+
+  <div class="panel">
+    <h2>Recent launches</h2>
+    <ul class="launches" id="launches"><li>none yet</li></ul>
+  </div>
+
+  <div class="foot" id="foot"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let dragging = false; // don't clobber sliders mid-drag with poll updates
+
+async function post(patch){
+  const r = await fetch('/api/control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
+  return r.json();
+}
+async function poll(){
+  try{
+    const s = await fetch('/api/status').then(r=>r.json());
+    render(s);
+  }catch(e){ $('banner').textContent='disconnected — is the panel process running?'; }
+}
+
+function money(n){ return (n).toFixed(4)+' SOL'; }
+
+function render(s){
+  $('treasury').textContent = 'treasury '+s.treasury+(s.mint?'  ·  CA '+s.mint:'');
+  const b = $('banner');
+  b.className = 'banner '+(s.dryRun?'dry':'live');
+  b.textContent = s.dryRun ? '🟢 DRY RUN — simulating, no real transactions' : '🔴 LIVE — spending real SOL';
+
+  $('stats').innerHTML = [
+    ['Balance', money(s.balanceSol), 'spendable '+s.spendableSol.toFixed(3)],
+    ['Spam budget', money(s.budgetSol), s.runway+' pairs queued'],
+    ['Claimable fees', money(s.claimableSol), 'auto-claimed'],
+    ['Reward rate', s.rewardSolPerHr.toFixed(3)+' SOL/hr', '~'+s.sustainablePairsPerHr+' pairs/hr'],
+    ['Launched', String(s.launchedLifetime), s.devWalletsUnswept+' unswept'],
+    ['Cost / pair', money(s.costPerPairSol), 'this cadence '+s.currentIntervalSec+'s'],
+  ].map(([k,v,x])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v} <small>${x||''}</small></div></div>`).join('');
+
+  const on = s.control.running;
+  const badge = $('stateBadge');
+  badge.className = 'state-badge '+(on?'on':'off');
+  badge.innerHTML = `<span class="dot ${on?'on':'off'}"></span>${on?'RUNNING':'PAUSED'}`;
+
+  if(!dragging){
+    $('burst').value = s.control.burst; $('burstVal').textContent = s.control.burst;
+    $('interval').value = Math.min(120,s.control.intervalSec); $('intervalVal').textContent = s.control.intervalSec+'s';
+    $('maxIntervalSec').value = s.control.maxIntervalSec;
+    $('fullSpeedRunway').value = s.control.fullSpeedRunway;
+    $('claimEverySec').value = s.control.claimEverySec;
+    highlightPreset(s.control);
+  }
+  const perHr = Math.round(s.control.burst*(3600/s.control.intervalSec));
+  const burnHr = (perHr*s.costPerPairSol).toFixed(2);
+  $('rateSummary').textContent = `At full speed: ${s.control.burst} every ${s.control.intervalSec}s ≈ ${perHr.toLocaleString()} pairs/hr, ~${burnHr} SOL/hr. Sustained pace follows your fee income.`;
+
+  $('launches').innerHTML = s.recent.length ? s.recent.map(l=>
+    `<li><span class="nm">${l.name||l.symbol||'pair'}</span>`+
+    `<a href="https://pump.fun/coin/${l.mint}" target="_blank">${l.mint.slice(0,4)}…${l.mint.slice(-4)} ↗</a></li>`).join('') : '<li>none yet</li>';
+
+  $('foot').textContent = 'poll 2s · reward-funded '+s.rewardFractionPct+'% · '+(s.dryRun?'dry run':'live');
+}
+
+function highlightPreset(c){
+  const P={low:{b:1,i:60},medium:{b:1,i:15},high:{b:2,i:5}};
+  document.querySelectorAll('#presets button').forEach(btn=>{
+    const p=P[btn.dataset.preset];
+    btn.classList.toggle('active', p && c.burst===p.b && c.intervalSec===p.i);
+  });
+}
+
+// --- controls ---
+$('startBtn').onclick = ()=>post({running:true}).then(render);
+$('stopBtn').onclick  = ()=>post({running:false}).then(render);
+
+for(const btn of document.querySelectorAll('#presets button')){
+  btn.onclick = ()=>post({preset:btn.dataset.preset}).then(render);
+}
+
+function bindSlider(id, valId, fmt, key){
+  const el=$(id);
+  el.addEventListener('input', ()=>{ dragging=true; $(valId).textContent=fmt(el.value); });
+  el.addEventListener('change', async ()=>{ await post({[key]:Number(el.value)}); dragging=false; });
+}
+bindSlider('burst','burstVal',v=>v,'burst');
+bindSlider('interval','intervalVal',v=>v+'s','intervalSec');
+
+for(const [id,key] of [['maxIntervalSec','maxIntervalSec'],['fullSpeedRunway','fullSpeedRunway'],['claimEverySec','claimEverySec']]){
+  $(id).addEventListener('change', ()=>post({[key]:Number($(id).value)}));
+}
+
+poll(); setInterval(poll, 2000);
+</script>
+</body>
+</html>

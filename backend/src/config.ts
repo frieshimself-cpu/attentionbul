@@ -1,7 +1,11 @@
 import 'dotenv/config';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { PublicKey } from '@solana/web3.js';
 
 const LAMPORTS_PER_SOL = 1_000_000_000;
+const ENV_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env');
 
 function envStr(name: string, fallback?: string): string {
   const v = process.env[name] ?? fallback;
@@ -54,6 +58,28 @@ export function resolvePreset(name: string | undefined): SpamPreset {
 const activePreset = resolvePreset(process.env.SPAM_PRESET);
 const preset = SPAM_PRESETS[activePreset];
 
+export type LivePreset = { name: SpamPreset } & (typeof SPAM_PRESETS)[SpamPreset];
+
+/**
+ * Re-read the preset from .env at RUNTIME so the engine can change speed
+ * without a restart: `npm run preset high|medium|low` rewrites .env and the
+ * running engine picks it up within one loop tick. Falls back to the startup
+ * preset if the file can't be read.
+ */
+export function livePreset(): LivePreset {
+  let name = activePreset;
+  try {
+    const line = fs
+      .readFileSync(ENV_PATH, 'utf8')
+      .split('\n')
+      .find((l) => l.startsWith('SPAM_PRESET='));
+    if (line) name = resolvePreset(line.slice('SPAM_PRESET='.length).trim());
+  } catch {
+    /* keep startup preset */
+  }
+  return { name, ...SPAM_PRESETS[name] };
+}
+
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
  * 50% pair spam / 50% bagworker army.
@@ -100,6 +126,10 @@ export const config = {
   spamMaxIntervalSec: envNum('SPAM_MAX_INTERVAL_SEC', preset.maxInterval),
   spamFullSpeedRunway: envNum('SPAM_FULL_SPEED_RUNWAY', preset.fullSpeedRunway),
   spamClaimEverySec: envNum('SPAM_CLAIM_EVERY_SEC', 300),
+  // Autoclaim polls this often but only SENDS a claim tx when the claimable
+  // amount clears this floor — so claiming every 5s never burns fees on dust
+  // (a claim can create a ~0.002 SOL WSOL account, so sub-floor claims lose money).
+  minClaimLamports: solToLamports(envNum('MIN_CLAIM_SOL', 0.005)),
   // Fraction of each claim that funds spam (1.0 = all of it; 0.5 keeps half for
   // bagworkers). The spam engine only ever spends this reward budget — never
   // principal — so the launch rate tracks the fee-earning rate.

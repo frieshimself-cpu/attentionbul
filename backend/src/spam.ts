@@ -111,7 +111,14 @@ async function getMetadataUri(state: BotState, name: string, symbol: string): Pr
  * curve with a SEPARATE buy after the create confirms; a failed dev buy
  * doesn't fail the launch (the billboard is already live).
  */
-export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<string | null> {
+/** A launch's outcome. `funded` = SOL already left the treasury into the dev
+ *  wallet (recoverable via sweep), so the caller must NOT refund the budget. */
+export interface LaunchResult {
+  mint: string | null;
+  funded: boolean;
+}
+
+export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<LaunchResult> {
   const funding = launchCostLamports();
   // A fresh, slightly-different name/ticker each launch (same image, no links).
   const { name, symbol } = varyName(config.spamTokenName);
@@ -121,56 +128,72 @@ export async function launchSpamPair(treasury: Keypair, state: BotState): Promis
       `and launch "${name}" ($${symbol}) #${state.spamLaunchCount + 1}` +
       (config.spamDevBuySol > 0 ? ` + ${config.spamDevBuySol} SOL dev buy` : ' (create-only)'));
     ledger({ action: 'spamLaunch', dryRun: true, name, symbol, funding: funding.toString() });
-    return null;
+    return { mint: null, funded: false };
   }
 
+  // Pre-funding: pin metadata. If this throws, no SOL has moved (funded=false).
   const uri = await getMetadataUri(state, name, symbol);
 
-  // 1. Fresh dev wallet for this billboard. Persist the key BEFORE funding so
-  //    a crash mid-launch can never lose access to the SOL we're about to send.
+  // Fresh dev wallet. Persist the key BEFORE funding so a crash can't strand SOL.
   const dev = Keypair.generate();
   const devPk = dev.publicKey.toBase58();
-  upsertDevWallet({
-    ts: new Date().toISOString(),
-    pubkey: devPk,
-    secret: bs58.encode(dev.secretKey),
-    fundedLamports: funding.toString(),
-    status: 'funded',
-  });
+  const rec = () => ({ ts: new Date().toISOString(), pubkey: devPk, secret: bs58.encode(dev.secretKey), fundedLamports: funding.toString() });
+  upsertDevWallet({ ...rec(), status: 'funded' as const });
 
-  // 2. Fund the dev wallet from the treasury.
-  const fundSig = await sendInstructions(
-    [SystemProgram.transfer({ fromPubkey: treasury.publicKey, toPubkey: dev.publicKey, lamports: funding })],
-    treasury,
-    [],
-    'fund-dev-wallet'
-  );
-  log(`spam: funded fresh dev wallet ${devPk} with ${lamportsToSol(funding).toFixed(4)} SOL (tx ${fundSig})`);
+  let funded = false;
+  try {
+    // Fund the dev wallet from the treasury — after this, money has left.
+    const fundSig = await sendInstructions(
+      [SystemProgram.transfer({ fromPubkey: treasury.publicKey, toPubkey: dev.publicKey, lamports: funding })],
+      treasury,
+      [],
+      'fund-dev-wallet'
+    );
+    funded = true;
+    log(`spam: funded fresh dev wallet ${devPk} with ${lamportsToSol(funding).toFixed(4)} SOL (tx ${fundSig})`);
 
-  // 3. The dev wallet creates the billboard (dev wallet + mint co-sign).
-  const mintKeypair = Keypair.generate();
-  const mint = mintKeypair.publicKey.toBase58();
-  const createTx = await pumpPortalTx(
-    {
-      publicKey: devPk, // this fresh wallet is the pair's creator
-      action: 'create',
-      tokenMetadata: { name, symbol, uri }, // varied per launch
-      mint,
-      denominatedInSol: 'true', // string on purpose — the API rejects JSON booleans
-      amount: 0,
-      slippage: Math.max(1, Math.round(config.slippageBps / 100)),
-      priorityFee: 0.0001,
-      pool: 'pump',
-    },
-    'create'
-  );
-  const sig = await sendSerializedTx(createTx, [mintKeypair, dev], 'spam-launch');
+    // The dev wallet creates the billboard (dev wallet + mint co-sign).
+    const mintKeypair = Keypair.generate();
+    const mint = mintKeypair.publicKey.toBase58();
+    const createTx = await pumpPortalTx(
+      {
+        publicKey: devPk, // this fresh wallet is the pair's creator
+        action: 'create',
+        tokenMetadata: { name, symbol, uri }, // varied per launch
+        mint,
+        denominatedInSol: 'true', // string on purpose — the API rejects JSON booleans
+        amount: 0,
+        slippage: Math.max(1, Math.round(config.slippageBps / 100)),
+        priorityFee: 0.0001,
+        pool: 'pump',
+      },
+      'create'
+    );
+    const sig = await sendSerializedTx(createTx, [mintKeypair, dev], 'spam-launch');
 
-  state.spamLaunchCount += 1;
-  saveState(state);
-  upsertDevWallet({ ts: new Date().toISOString(), pubkey: devPk, secret: bs58.encode(dev.secretKey), fundedLamports: funding.toString(), mint, status: 'launched' });
-  log(`spam: billboard #${state.spamLaunchCount} "${name}" ($${symbol}) live at ${mint} — https://pump.fun/coin/${mint}`);
-  ledger({ action: 'spamLaunch', mint, name, symbol, devWallet: devPk, launchNumber: state.spamLaunchCount, sig });
+    state.spamLaunchCount += 1;
+    saveState(state);
+    upsertDevWallet({ ...rec(), mint, status: 'launched' });
+    log(`spam: billboard #${state.spamLaunchCount} "${name}" ($${symbol}) live at ${mint} — https://pump.fun/coin/${mint}`);
+    ledger({ action: 'spamLaunch', mint, name, symbol, devWallet: devPk, launchNumber: state.spamLaunchCount, sig });
+
+    return await withOptionalDevBuy(dev, devPk, mint, state, funded);
+  } catch (err) {
+    // Mark the wallet 'failed' if it was funded so `npm run sweep` reclaims it.
+    upsertDevWallet({ ...rec(), status: 'failed' as const });
+    (err as Error & { funded?: boolean }).funded = funded;
+    throw err;
+  }
+}
+
+/** Optional dev buy after a successful create; failure never fails the launch. */
+async function withOptionalDevBuy(
+  dev: Keypair,
+  devPk: string,
+  mint: string,
+  state: BotState,
+  funded: boolean
+): Promise<LaunchResult> {
 
   // 4. Optional separate dev buy (from the same fresh wallet) to seed the curve.
   if (config.spamDevBuySol > 0) {
@@ -197,5 +220,5 @@ export async function launchSpamPair(treasury: Keypair, state: BotState): Promis
     }
   }
 
-  return mint;
+  return { mint, funded };
 }
