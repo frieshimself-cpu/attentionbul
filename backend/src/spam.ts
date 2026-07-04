@@ -8,6 +8,7 @@ import { sendSerializedTx, sendInstructions } from './rpc.js';
 import { log, ledger } from './log.js';
 import { BotState, saveState } from './state.js';
 import { upsertDevWallet } from './keystore.js';
+import { varyName } from './names.js';
 
 const backendDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUMPPORTAL = 'https://pumpportal.fun/api/trade-local';
@@ -54,44 +55,44 @@ async function pinToIpfs(body: Blob, filename: string): Promise<string> {
   return json.data.cid;
 }
 
-/**
- * Metadata is identical for every billboard launch. Resolution order:
- *   1. SPAM_METADATA_URI env — reuse an already-pinned URI (no Pinata needed).
- *   2. a URI we pinned on a previous run (cached in state).
- *   3. pin the image + JSON fresh via Pinata (needs PINATA_JWT).
- * (pump.fun's own /api/ipfs endpoint is discontinued.)
- */
-async function getMetadataUri(state: BotState): Promise<string> {
-  if (config.spamMetadataUri) return config.spamMetadataUri;
-  if (state.spamMetadataUri) return state.spamMetadataUri;
-
+/** Pin the billboard image once and cache its CID; reused across every pair. */
+async function getImageCid(state: BotState): Promise<string> {
+  if (state.spamImageCid) return state.spamImageCid;
   const imagePath = path.resolve(backendDir, config.spamImagePath);
   const fallback = path.resolve(backendDir, '../assets/logo.svg');
   const chosen = fs.existsSync(imagePath) ? imagePath : fallback;
   if (chosen === fallback) log(`spam: image ${imagePath} not found, using ${fallback}`);
   const mime = chosen.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
-  const imageCid = await pinToIpfs(new Blob([fs.readFileSync(chosen)], { type: mime }), path.basename(chosen));
+  const cid = await pinToIpfs(new Blob([fs.readFileSync(chosen)], { type: mime }), path.basename(chosen));
+  state.spamImageCid = cid;
+  saveState(state);
+  return cid;
+}
 
+/**
+ * Metadata URI for one launch:
+ *   1. SPAM_METADATA_URI env — reuse a fixed already-pinned URI (no Pinata). The
+ *      image is shared; the on-chain name still varies per pair.
+ *   2. Otherwise pin a fresh, LINK-FREE per-pair JSON via Pinata: just the
+ *      varied name/symbol + the shared image. No website, CA, twitter or
+ *      telegram — nothing that links the pairs to each other or the project.
+ * (pump.fun's own /api/ipfs endpoint is discontinued.)
+ */
+async function getMetadataUri(state: BotState, name: string, symbol: string): Promise<string> {
+  if (config.spamMetadataUri) return config.spamMetadataUri;
+
+  const imageCid = await getImageCid(state);
   const metadata = {
-    name: config.spamTokenName,
-    symbol: config.spamTokenSymbol,
+    name,
+    symbol,
     image: `https://ipfs.io/ipfs/${imageCid}`,
-    description:
-      `This is a $BULLPOST billboard. The bull never shuts up. ` +
-      `Official website: ${config.officialWebsite}` +
-      (config.bullpostMint ? ` | Official CA: ${config.bullpostMint}` : ''),
-    ...(config.officialTwitter ? { twitter: config.officialTwitter } : {}),
-    ...(config.officialTelegram ? { telegram: config.officialTelegram } : {}),
-    website: config.officialWebsite,
+    showName: true,
   };
   const metaCid = await pinToIpfs(
     new Blob([JSON.stringify(metadata)], { type: 'application/json' }),
     'metadata.json'
   );
-  state.spamMetadataUri = `https://ipfs.io/ipfs/${metaCid}`;
-  saveState(state);
-  log(`spam: pinned metadata ${state.spamMetadataUri}`);
-  return state.spamMetadataUri;
+  return `https://ipfs.io/ipfs/${metaCid}`;
 }
 
 /**
@@ -112,16 +113,18 @@ async function getMetadataUri(state: BotState): Promise<string> {
  */
 export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<string | null> {
   const funding = launchCostLamports();
+  // A fresh, slightly-different name/ticker each launch (same image, no links).
+  const { name, symbol } = varyName(config.spamTokenName);
 
   if (config.dryRun) {
     log(`spam: would generate a fresh dev wallet, fund it ${lamportsToSol(funding).toFixed(4)} SOL, ` +
-      `and launch billboard #${state.spamLaunchCount + 1}` +
+      `and launch "${name}" ($${symbol}) #${state.spamLaunchCount + 1}` +
       (config.spamDevBuySol > 0 ? ` + ${config.spamDevBuySol} SOL dev buy` : ' (create-only)'));
-    ledger({ action: 'spamLaunch', dryRun: true, funding: funding.toString(), devBuySol: config.spamDevBuySol });
+    ledger({ action: 'spamLaunch', dryRun: true, name, symbol, funding: funding.toString() });
     return null;
   }
 
-  const uri = await getMetadataUri(state);
+  const uri = await getMetadataUri(state, name, symbol);
 
   // 1. Fresh dev wallet for this billboard. Persist the key BEFORE funding so
   //    a crash mid-launch can never lose access to the SOL we're about to send.
@@ -151,7 +154,7 @@ export async function launchSpamPair(treasury: Keypair, state: BotState): Promis
     {
       publicKey: devPk, // this fresh wallet is the pair's creator
       action: 'create',
-      tokenMetadata: { name: config.spamTokenName, symbol: config.spamTokenSymbol, uri },
+      tokenMetadata: { name, symbol, uri }, // varied per launch
       mint,
       denominatedInSol: 'true', // string on purpose — the API rejects JSON booleans
       amount: 0,
@@ -166,8 +169,8 @@ export async function launchSpamPair(treasury: Keypair, state: BotState): Promis
   state.spamLaunchCount += 1;
   saveState(state);
   upsertDevWallet({ ts: new Date().toISOString(), pubkey: devPk, secret: bs58.encode(dev.secretKey), fundedLamports: funding.toString(), mint, status: 'launched' });
-  log(`spam: billboard #${state.spamLaunchCount} live at ${mint} — https://pump.fun/coin/${mint}`);
-  ledger({ action: 'spamLaunch', mint, devWallet: devPk, launchNumber: state.spamLaunchCount, sig });
+  log(`spam: billboard #${state.spamLaunchCount} "${name}" ($${symbol}) live at ${mint} — https://pump.fun/coin/${mint}`);
+  ledger({ action: 'spamLaunch', mint, name, symbol, devWallet: devPk, launchNumber: state.spamLaunchCount, sig });
 
   // 4. Optional separate dev buy (from the same fresh wallet) to seed the curve.
   if (config.spamDevBuySol > 0) {

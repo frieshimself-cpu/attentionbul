@@ -17,6 +17,7 @@ export interface BotState {
   totalClaimedLamports: string;
   spamLaunchCount: number;
   spamMetadataUri?: string; // pinned once, reused for every billboard launch
+  spamImageCid?: string; // image pinned once, reused across per-pair metadata
   spamSeeded?: boolean; // one-time principal seed applied
   recentClaims?: { ts: number; lamports: string }[]; // rolling window for reward-rate
   lastCycleAt: string | null;
