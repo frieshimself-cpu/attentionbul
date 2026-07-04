@@ -120,29 +120,34 @@ export async function runSpamEngine(
         continue;
       }
 
+      const cost = launchCostLamports();
       let burst = Math.min(c.burst, runway);
       if (capped) burst = Math.min(burst, maxLaunches! - launched);
-      const intervalSec = throttleIntervalSec(runway, c);
-      log(`engine: bursting ${burst} (budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL = ${runway} pairs, next in ${intervalSec}s)`);
+      // Reserve guard for the whole burst: never fund more than the wallet can spare.
+      const affordable = Number(spendable / cost);
+      burst = Math.min(burst, affordable);
+      if (burst < 1) { await interruptibleSleep(c.intervalSec); continue; }
 
-      for (let i = 0; i < burst; i++) {
-        if (!getControl().running) break; // paused mid-burst
-        if (!config.dryRun && (await spendableLamports(treasury)) < launchCostLamports()) {
-          log('engine: hit reserve floor mid-burst — pausing launches.');
-          break;
-        }
-        if (!config.dryRun) { debitBucket(state, 'pairSpam', launchCostLamports()); saveState(state); }
-        try {
-          await launchSpamPair(treasury, state);
-          launched++;
-        } catch (err) {
-          const funded = (err as Error & { funded?: boolean }).funded;
-          if (!config.dryRun && !funded) { creditBuckets(state, { pairSpam: launchCostLamports(), bagworkers: 0n }); saveState(state); }
-          log(`engine: launch failed${funded ? ' after funding (recover via sweep)' : ' (budget refunded)'}: ${(err as Error).message}`);
-          ledger({ action: 'engineLaunchError', funded: !!funded, error: (err as Error).message });
-        }
-        if (capped && launched >= maxLaunches!) break;
+      const intervalSec = throttleIntervalSec(runway, c);
+      log(`engine: bursting ${burst} in parallel (budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL = ${runway} pairs, next in ${intervalSec}s)`);
+
+      // Debit the whole burst up-front, then fire all launches CONCURRENTLY.
+      // Safe because every shared-state write (saveState, keystore, count++) is
+      // synchronous — no interleaving mid-write in Node's single thread.
+      if (!config.dryRun) { for (let i = 0; i < burst; i++) debitBucket(state, 'pairSpam', cost); saveState(state); }
+
+      const results = await Promise.allSettled(
+        Array.from({ length: burst }, () => launchSpamPair(treasury, state))
+      );
+      let refund = 0n;
+      for (const r of results) {
+        if (r.status === 'fulfilled') { launched++; continue; }
+        const funded = (r.reason as { funded?: boolean })?.funded;
+        if (!config.dryRun && !funded) refund += cost; // no SOL left → give the budget back
+        log(`engine: launch failed${funded ? ' after funding (recover via sweep)' : ' (budget refunded)'}: ${(r.reason as Error)?.message}`);
+        ledger({ action: 'engineLaunchError', funded: !!funded, error: (r.reason as Error)?.message });
       }
+      if (!config.dryRun && refund > 0n) { creditBuckets(state, { pairSpam: refund, bagworkers: 0n }); saveState(state); }
 
       if (capped && launched >= maxLaunches!) { log(`engine: reached launch cap (${launched}) — stopping.`); break; }
 
