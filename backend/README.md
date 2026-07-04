@@ -51,19 +51,34 @@ npm run loop       # cycle every CYCLE_MINUTES, forever
 npm test           # allocation math self-checks
 ```
 
-## The spam engine (`npm run spam`)
+## The spam engine (`npm run spam`) — paced by creator rewards
 
-Continuously claims creator fees and launches billboards, each from its own
-fresh dev wallet, **throttling the cadence down as the treasury drains**:
+The spam is **funded by, and paced to, the creator rewards themselves.** Claimed
+fees go into a spam budget; the engine only launches from that budget and never
+touches principal. So the launch rate automatically tracks the earning rate —
+spam fast when fees pour in, slow when they don't, pause when they stop.
 
-- Bursts `SPAM_BURST_SIZE` (default 3) pairs at a time.
-- Full speed (`SPAM_MIN_INTERVAL_SEC`, default 5s) while the wallet can afford
-  ≥ `SPAM_FULL_SPEED_RUNWAY` more pairs; the interval then stretches toward
-  `SPAM_MAX_INTERVAL_SEC` (120s) as funds run low — e.g. 5s → 8s → 13s → 25s →
-  42s → 120s as runway shrinks 25 → 15 → 10 → 5 → 3 → 1.
-- Re-claims fees every `SPAM_CLAIM_EVERY_SEC` so the runway refills as pairs
-  (and the main coin) earn.
-- Stops when it runs out of spendable SOL (keeping `RESERVE_SOL` untouched).
+How the timing works:
+
+1. **Claim → fill budget.** Each claim adds `SPAM_REWARD_FRACTION` of the fees
+   (default 100%) to the spam budget. Re-claims every `SPAM_CLAIM_EVERY_SEC`.
+2. **Burst from the budget.** Launches `SPAM_BURST_SIZE` (3) pairs at a time,
+   each from a fresh dev wallet, debiting the budget per launch.
+3. **Throttle by budget depth** — which reflects how fast you're earning. Full
+   speed (`SPAM_MIN_INTERVAL_SEC`, 5s) while the budget holds ≥
+   `SPAM_FULL_SPEED_RUNWAY` (25) pairs; the interval then stretches toward
+   `SPAM_MAX_INTERVAL_SEC` (120s) as it drains: 5s → 8s → 13s → 25s → 42s →
+   120s for a budget of 25 → 15 → 10 → 5 → 3 → 1 pairs.
+4. **Budget empty → wait for fees.** It pauses and re-claims rather than dipping
+   into principal. `RESERVE_SOL` is always kept for gas.
+
+The steady-state rate self-balances to your fee income: `pairs/hr ≈
+(reward SOL/hr × SPAM_REWARD_FRACTION) / cost-per-pair`. `npm run status` shows
+the measured reward rate and that sustainable pace.
+
+**Bootstrap:** to start launching before fees have accrued, set `SPAM_SEED_SOL`
+to seed the budget from principal once (e.g. `0.1`). Default `0` = pure
+rewards-funded.
 
 ```bash
 npm run spam                 # run until out of funds (Ctrl-C to stop)

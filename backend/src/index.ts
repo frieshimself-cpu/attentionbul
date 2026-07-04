@@ -2,7 +2,7 @@ import { Keypair } from '@solana/web3.js';
 import { config, lamportsToSol, solToLamports, validateLiveConfig } from './config.js';
 import { loadKeypair } from './wallet.js';
 import { splitLamports } from './split.js';
-import { loadState, saveState, getBucket, creditBuckets, debitBucket, BotState } from './state.js';
+import { loadState, saveState, getBucket, creditBuckets, debitBucket, rewardRatePerHour, BotState } from './state.js';
 import { connection } from './rpc.js';
 import { claimRewards, getClaimable } from './claim.js';
 import { payBagworkers } from './payroll.js';
@@ -111,26 +111,30 @@ function printStatus(state: BotState): void {
   );
 }
 
-/** Live management view: on-chain balance, claimable fees, runway, rate, dev wallets. */
+/** Live management view: balance, claimable, reward budget + rate, runway, dev wallets. */
 async function printManagementView(treasury: Keypair, state: BotState): Promise<void> {
   const [balance, claimable] = await Promise.all([
     connection.getBalance(treasury.publicKey, 'confirmed').then((b) => BigInt(b)),
     getClaimable(treasury),
   ]);
   const spendable = balance > config.reserveLamports ? balance - config.reserveLamports : 0n;
-  const runway = Number(spendable / launchCostLamports());
+  const budget = getBucket(state, 'pairSpam');
+  const runway = Number(budget / launchCostLamports());
   const interval = throttleIntervalSec(runway);
+  const cost = launchCostLamports();
+  const ratePerHour = rewardRatePerHour(state);
+  const pairsPerHour = ratePerHour > 0n ? Number((ratePerHour * BigInt(Math.round(config.spamRewardFraction * 100))) / 100n / cost) : 0;
   const wallets = loadDevWallets();
   const unswept = wallets.filter((w) => w.status !== 'swept').length;
 
   log('================ $BULLPOST bot status ================');
-  log(`treasury:   ${treasury.publicKey.toBase58()}`);
-  log(`balance:    ${lamportsToSol(balance).toFixed(4)} SOL  (spendable ${lamportsToSol(spendable).toFixed(4)}, reserve ${lamportsToSol(config.reserveLamports).toFixed(4)})`);
-  log(`claimable:  ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
-  log(`runway:     ${runway} more pairs at ${lamportsToSol(launchCostLamports()).toFixed(4)} SOL each`);
-  log(`cadence:    burst ${config.spamBurstSize} every ${interval}s at this balance (min ${config.spamMinIntervalSec}s / max ${config.spamMaxIntervalSec}s)`);
-  log(`launched:   ${state.spamLaunchCount} lifetime | dev wallets tracked ${wallets.length} (${unswept} unswept — reclaim with 'npm run sweep')`);
-  printStatus(state);
+  log(`treasury:      ${treasury.publicKey.toBase58()}`);
+  log(`balance:       ${lamportsToSol(balance).toFixed(4)} SOL  (spendable ${lamportsToSol(spendable).toFixed(4)}, reserve ${lamportsToSol(config.reserveLamports).toFixed(4)})`);
+  log(`claimable:     ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
+  log(`spam budget:   ${lamportsToSol(budget).toFixed(4)} SOL = ${runway} pairs queued (funded by ${Math.round(config.spamRewardFraction * 100)}% of rewards)`);
+  log(`reward rate:   ${lamportsToSol(ratePerHour).toFixed(4)} SOL/hr in fees  ->  ~${pairsPerHour} pairs/hr sustainable`);
+  log(`cadence now:   burst ${config.spamBurstSize} every ${interval}s (min ${config.spamMinIntervalSec}s / max ${config.spamMaxIntervalSec}s)`);
+  log(`launched:      ${state.spamLaunchCount} lifetime | dev wallets ${wallets.length} (${unswept} unswept — 'npm run sweep')`);
   log('======================================================');
 }
 

@@ -74,6 +74,13 @@ export const config = {
   spamMaxIntervalSec: envNum('SPAM_MAX_INTERVAL_SEC', 120),
   spamFullSpeedRunway: envNum('SPAM_FULL_SPEED_RUNWAY', 25),
   spamClaimEverySec: envNum('SPAM_CLAIM_EVERY_SEC', 300),
+  // Fraction of each claim that funds spam (1.0 = all of it; 0.5 keeps half for
+  // bagworkers). The spam engine only ever spends this reward budget — never
+  // principal — so the launch rate tracks the fee-earning rate.
+  spamRewardFraction: envNum('SPAM_REWARD_FRACTION', 1.0),
+  // Optional one-time bootstrap: seed the spam budget from principal so the
+  // engine can start launching before fees have accrued. 0 = pure rewards-funded.
+  spamSeedLamports: solToLamports(envNum('SPAM_SEED_SOL', 0)),
 } as const;
 
 /**

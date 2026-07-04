@@ -17,7 +17,26 @@ export interface BotState {
   totalClaimedLamports: string;
   spamLaunchCount: number;
   spamMetadataUri?: string; // pinned once, reused for every billboard launch
+  spamSeeded?: boolean; // one-time principal seed applied
+  recentClaims?: { ts: number; lamports: string }[]; // rolling window for reward-rate
   lastCycleAt: string | null;
+}
+
+/** Record a claim for reward-rate estimation; keeps the last 50. */
+export function recordClaim(state: BotState, lamports: bigint, ts: number): void {
+  if (lamports <= 0n) return;
+  state.recentClaims = [...(state.recentClaims ?? []), { ts, lamports: lamports.toString() }].slice(-50);
+}
+
+/** Estimated reward inflow in lamports/hour from the recent-claims window. */
+export function rewardRatePerHour(state: BotState): bigint {
+  const claims = state.recentClaims ?? [];
+  if (claims.length < 2) return 0n;
+  const spanMs = claims[claims.length - 1].ts - claims[0].ts;
+  if (spanMs <= 0) return 0n;
+  // Sum everything after the first sample (the first just marks the window start).
+  const total = claims.slice(1).reduce((a, c) => a + BigInt(c.lamports), 0n);
+  return (total * 3_600_000n) / BigInt(spanMs);
 }
 
 const stateDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'state');
