@@ -82,7 +82,7 @@ export function livePreset(): LivePreset {
 
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
- * 100% pair spam — flood the trenches with new pairs of the runner (ANSEM).
+ * 100% pair spam — flood the trenches with new $SPAM pairs, non-stop.
  */
 export const ALLOCATION_BPS = {
   spam: 10_000,
@@ -103,9 +103,9 @@ export const config = {
 
   spamDevBuySol: envNum('SPAM_DEV_BUY_SOL', 0),
   spamMaxLaunchesPerCycle: envNum('SPAM_MAX_LAUNCHES_PER_CYCLE', 3),
-  spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.png'),
-  spamTokenName: envStr('SPAM_TOKEN_NAME', 'The Black Bull'),
-  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'ANSEM'),
+  spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.jpg'),
+  spamTokenName: envStr('SPAM_TOKEN_NAME', '$SPAM'),
+  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'SPAM'),
   // Vary the pair name slightly per launch? Off = every trench pair is an
   // identical clone of the runner (the point: flood with THIS coin).
   spamVaryName: envBool('SPAM_VARY_NAME', false),
@@ -113,7 +113,7 @@ export const config = {
   // If set, reuse this already-pinned metadata URI for every launch instead of
   // pinning fresh via Pinata. Lets the engine run with no Pinata key at all.
   spamMetadataUri: process.env.SPAM_METADATA_URI ?? '',
-  officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://bullpost.fun'),
+  officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://spam.fun'),
   officialTwitter: process.env.OFFICIAL_TWITTER ?? '',
   officialTelegram: process.env.OFFICIAL_TELEGRAM ?? '',
 

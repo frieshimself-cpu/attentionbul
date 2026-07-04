@@ -1,9 +1,9 @@
 {
-  "name": "bullpost-backend",
+  "name": "spam-backend",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "$BULLPOST creator-rewards bot: claim rewards, spam-launch pairs, buy back and feed the legends, pay the bagworkers",
+  "description": "$SPAM creator-rewards bot: claim pump.fun creator fees and recycle 100% into spam-launching new pairs",
   "scripts": {
     "cycle": "tsx src/index.ts",
     "loop": "tsx src/index.ts --loop",

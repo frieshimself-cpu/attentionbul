@@ -1,16 +1,15 @@
-# $BULLPOST rewards bot
+# $SPAM rewards bot
 
-Self-hosted bot that turns pump.fun creator rewards into marketing, on a loop:
+Self-hosted bot that turns pump.fun creator rewards into more pairs, on a loop:
 
 ```
 claim creator rewards (bonding curve + PumpSwap vaults)
         │
         ▼
- split 50 / 50 into persistent buckets
+ 100% into the spam budget (persistent)
         │
-        ├─ 50%  Pair Spam Engine  → launches new $BULLPOST billboard pairs on pump.fun
-        └─ 50%  Bagworker Army     → SOL forwarded to the bagworker wallet, which pays
-                                     the hired army bullposting $BULLPOST everywhere
+        └─ Pair Spam Engine → launches new $SPAM pairs on pump.fun, non-stop,
+                              each from a fresh throwaway dev wallet
 ```
 
 Keys never leave the box: claims are built with the official `@pump-fun/pump-sdk`
@@ -35,11 +34,11 @@ You need:
 
 | Thing | Where |
 | --- | --- |
-| `CREATOR_WALLET_SECRET` | The wallet that launched $BULLPOST (it accrues the creator rewards). Phantom base58 export or solana-keygen JSON array. |
-| `BAGWORKER_WALLET` | Wallet that receives the 50% bagworker bucket. |
+| `CREATOR_WALLET_SECRET` | The wallet that launched $SPAM (it accrues the creator rewards). Phantom base58 export or solana-keygen JSON array. |
 | `RPC_URL` | Free Helius endpoint recommended (public RPC drops transactions under load). |
-| `PINATA_JWT` | Free at pinata.cloud — spam launches must pin token metadata to IPFS since pump.fun closed their upload endpoint. |
-| `BULLPOST_MINT` | Optional. The official CA, once launched — only used to stamp the CA into spam metadata. |
+| `SPAM_METADATA_URI` | Easiest metadata path — reuse an already-pinned metadata JSON (no key needed). Or set `PINATA_JWT` instead. |
+| `PINATA_JWT` | Optional. Free at pinata.cloud — pins token metadata to IPFS if you're not using `SPAM_METADATA_URI` (pump.fun closed their own upload endpoint). |
+| `COIN_MINT` | Optional. The official $SPAM CA, once launched — only used to stamp the CA into spam metadata. |
 
 ## Running
 
@@ -134,7 +133,7 @@ launches, and how many dev wallets are pending sweep.
 
 Set **`SPAM_METADATA_URI`** to any already-pinned metadata JSON and the engine
 reuses it for every launch with no IPFS key at all — easiest is to point it at
-your official $BULLPOST coin's own metadata URI, so the billboards show the real
+your official $SPAM coin's own metadata URI, so the pairs show the real
 logo. (Alternatively set `PINATA_JWT` and it pins the logo itself.)
 
 **`DRY_RUN=true` is the default.** The bot logs exactly what it would claim,
@@ -148,7 +147,7 @@ Dedicated one-shot commands so you can prove a path in isolation, cheaply:
 ```bash
 npm run claimable    # read-only: how much creator fee is claimable right now
 npm run claim        # claim creator fees only (no split/spam)
-npm run launch-one   # launch exactly ONE billboard from a fresh dev wallet
+npm run launch-one   # launch exactly ONE pair from a fresh dev wallet
 npm run sweep        # reclaim leftover SOL + fees from used dev wallets
 ```
 
@@ -172,7 +171,7 @@ Deploy anywhere Node 20+ runs (a $5 VPS is plenty). For unattended running:
 
 ```bash
 # systemd, pm2, or plain nohup:
-pm2 start "npm run loop" --name bullpost-bot --cwd backend
+pm2 start "npm run loop" --name spam-bot --cwd backend
 ```
 
 ## Safety rails
@@ -199,22 +198,26 @@ pm2 start "npm run loop" --name bullpost-bot --cwd backend
 src/index.ts     orchestrator, spam engine dispatch, management view, test cmds
 src/engine.ts    throttled spam engine (burst + auto-slowdown loop)
 src/claim.ts     creator-fee claim via @pump-fun/pump-sdk (+ WSOL unwrap)
-src/split.ts     integer 50/50 allocation math (tested)
-src/spam.ts      billboard launches from fresh per-pair dev wallets
+src/split.ts     integer 100%-to-spam allocation math (tested)
+src/spam.ts      pair launches from fresh per-pair dev wallets
 src/keystore.ts  persists the dev wallets (state/dev-wallets.json)
 src/sweep.ts     drains used dev wallets back to the treasury
-src/payroll.ts   SOL transfer to the bagworker wallet
 src/rpc.ts       simulate / confirm-by-signature / drain transaction landing
 src/state.ts     persistent buckets + ledger
+src/control.ts   live control file (state/control.json) the engine re-reads each tick
+src/server.ts    localhost admin panel (serves src/admin.html + control API)
+src/set.ts       `npm run set` CLI — hot speed/amount/claim changes
+src/names.ts     optional per-launch name variation (SPAM_VARY_NAME)
+src/wallet.ts    keypair loading (base58 or JSON array)
 ```
 
 ## Notes
 
-- The official $BULLPOST coin's creator fees (claimed wallet-wide by the
+- The official $SPAM coin's creator fees (claimed wallet-wide by the
   treasury) are what drive the flywheel. Spam pairs are launched by separate
   fresh wallets, so their own (usually negligible) fees don't auto-claim — run
   `npm run sweep` to pull them back in along with leftover launch SOL.
-- The billboard pairs' metadata carries the official website + CA in the
+- The spam pairs' metadata carries the official website + CA in the
   description, pinned once to IPFS and reused.
 - pump.fun fee schedule changes several times a year; percentages here are
   whatever the program pays out — the bot just claims and splits what arrives.

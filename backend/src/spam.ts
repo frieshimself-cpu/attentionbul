@@ -96,10 +96,10 @@ async function getMetadataUri(state: BotState, name: string, symbol: string): Pr
 }
 
 /**
- * Launch one $BULLPOST billboard on pump.fun via PumpPortal's local
+ * Launch one $SPAM pair on pump.fun via PumpPortal's local
  * (self-sign) API, returning the new mint address.
  *
- * Each billboard is created by its OWN fresh dev wallet (not the treasury) so
+ * Each pair is created by its OWN fresh dev wallet (not the treasury) so
  * the pairs aren't all traceable to one creator. The treasury funds that dev
  * wallet with exactly the launch cost, the dev wallet creates the pair, and
  * its key is saved to the keystore so leftover SOL / any fees it earns stay
@@ -109,7 +109,7 @@ async function getMetadataUri(state: BotState, name: string, symbol: string): Pr
  * rejects an atomic create+buy (verified — every nonzero `amount` 400s),
  * while create-only succeeds. If SPAM_DEV_BUY_SOL > 0 the dev wallet seeds the
  * curve with a SEPARATE buy after the create confirms; a failed dev buy
- * doesn't fail the launch (the billboard is already live).
+ * doesn't fail the launch (the pair is already live).
  */
 /** A launch's outcome. `funded` = SOL already left the treasury into the dev
  *  wallet (recoverable via sweep), so the caller must NOT refund the budget. */
@@ -120,9 +120,9 @@ export interface LaunchResult {
 
 export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<LaunchResult> {
   const funding = launchCostLamports();
-  // Every trench pair is the runner: "The Black Bull" ($ANSEM). Identical by
-  // default (that's the concept — flood with THIS coin); SPAM_VARY_NAME=true
-  // slightly varies it if you'd rather they not be exact clones.
+  // Every trench pair is $SPAM. Identical by default (that's the concept —
+  // flood with THIS coin); SPAM_VARY_NAME=true slightly varies it if you'd
+  // rather they not be exact clones.
   const { name, symbol } = config.spamVaryName
     ? varyName(config.spamTokenName)
     : { name: config.spamTokenName, symbol: config.spamTokenSymbol };

@@ -96,7 +96,7 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   const wallets = loadDevWallets();
   const unswept = wallets.filter((w) => w.status !== 'swept').length;
 
-  log('=========== The Black Bull ($ANSEM) — trench spam ===========');
+  log('=============== $SPAM — trench spam engine ===============');
   log(`treasury:      ${treasury.publicKey.toBase58()}`);
   log(`balance:       ${lamportsToSol(balance).toFixed(4)} SOL  (spendable ${lamportsToSol(spendable).toFixed(4)}, reserve ${lamportsToSol(config.reserveLamports).toFixed(4)})`);
   log(`claimable:     ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
@@ -144,7 +144,7 @@ async function main(): Promise<void> {
   // Offline status (no wallet needed): state file only.
   if (args.includes('--status') && !config.creatorWalletSecret) {
     printStatus(state);
-    log('allocation: 100% creator rewards → trench spam (The Black Bull / $ANSEM)');
+    log('allocation: 100% creator rewards → trench spam ($SPAM)');
     return;
   }
 

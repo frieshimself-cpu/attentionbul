@@ -1,4 +1,4 @@
-# Running the $BULLPOST bot on your own computer
+# Running the $SPAM bot on your own computer
 
 The bot is a small program you run on your machine. It holds your wallet key and
 sends transactions, so it has to run somewhere you control — it can't be a

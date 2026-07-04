@@ -1,61 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="The Black Bull — black bull head with gold horns">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="$SPAM coin">
   <defs>
-    <radialGradient id="ring" cx="50%" cy="42%" r="60%">
-      <stop offset="0%" stop-color="#1a1a1e"/>
-      <stop offset="100%" stop-color="#050506"/>
-    </radialGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FFE9A8"/>
-      <stop offset="45%" stop-color="#F5C542"/>
-      <stop offset="100%" stop-color="#9C701C"/>
-    </linearGradient>
-    <radialGradient id="fur" cx="50%" cy="35%" r="70%">
-      <stop offset="0%" stop-color="#2b2b31"/>
-      <stop offset="70%" stop-color="#151518"/>
-      <stop offset="100%" stop-color="#0a0a0c"/>
+    <radialGradient id="g" cx="42%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#FFF7C2"/>
+      <stop offset="45%" stop-color="#FFD429"/>
+      <stop offset="80%" stop-color="#E8A200"/>
+      <stop offset="100%" stop-color="#9B6400"/>
     </radialGradient>
   </defs>
-
-  <!-- coin ring -->
-  <circle cx="256" cy="256" r="248" fill="url(#ring)"/>
-  <circle cx="256" cy="256" r="248" fill="none" stroke="url(#gold)" stroke-width="8"/>
-  <circle cx="256" cy="256" r="228" fill="none" stroke="#3a2f14" stroke-width="2"/>
-
-  <!-- horns -->
-  <path d="M150 196 Q86 150 70 74 Q60 120 78 168 Q100 214 160 224 Z" fill="url(#gold)" stroke="#7A5210" stroke-width="3"/>
-  <path d="M362 196 Q426 150 442 74 Q452 120 434 168 Q412 214 352 224 Z" fill="url(#gold)" stroke="#7A5210" stroke-width="3"/>
-
-  <!-- ears -->
-  <path d="M150 232 Q112 224 96 250 Q126 262 156 256 Z" fill="url(#fur)" stroke="#000" stroke-width="2"/>
-  <path d="M362 232 Q400 224 416 250 Q386 262 356 256 Z" fill="url(#fur)" stroke="#000" stroke-width="2"/>
-
-  <!-- head -->
-  <path d="M256 214
-           Q344 214 350 292
-           Q356 356 320 398
-           Q290 430 256 432
-           Q222 430 192 398
-           Q156 356 162 292
-           Q168 214 256 214 Z" fill="url(#fur)" stroke="#000" stroke-width="3"/>
-
-  <!-- forelock -->
-  <path d="M212 226 Q256 210 300 226 Q288 250 256 252 Q224 250 212 226 Z" fill="#0c0c0e"/>
-
-  <!-- brow -->
-  <path d="M196 300 Q222 286 244 300" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round"/>
-  <path d="M268 300 Q290 286 316 300" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round"/>
-
-  <!-- glowing gold eyes -->
-  <ellipse cx="220" cy="312" rx="17" ry="12" fill="url(#gold)"/>
-  <ellipse cx="292" cy="312" rx="17" ry="12" fill="url(#gold)"/>
-  <ellipse cx="220" cy="312" rx="7" ry="9" fill="#3a2a08"/>
-  <ellipse cx="292" cy="312" rx="7" ry="9" fill="#3a2a08"/>
-
-  <!-- snout -->
-  <path d="M210 356 Q256 344 302 356 Q312 392 256 402 Q200 392 210 356 Z" fill="#232329" stroke="#000" stroke-width="2"/>
-  <ellipse cx="230" cy="374" rx="9" ry="7" fill="#0a0a0c"/>
-  <ellipse cx="282" cy="374" rx="9" ry="7" fill="#0a0a0c"/>
-  <!-- gold nose ring -->
-  <path d="M240 392 Q256 410 272 392" fill="none" stroke="url(#gold)" stroke-width="6"/>
-  <circle cx="256" cy="404" r="12" fill="none" stroke="url(#gold)" stroke-width="6"/>
+  <!-- spikes -->
+  <g fill="#FF2E63">
+    <g id="sp"><polygon points="256,4 276,60 236,60"/></g>
+  </g>
+  <g fill="#FF2E63">
+    <circle cx="256" cy="256" r="250"/>
+  </g>
+  <!-- coin -->
+  <circle cx="256" cy="256" r="224" fill="#8A5A00"/>
+  <circle cx="256" cy="256" r="214" fill="url(#g)" stroke="#B97F00" stroke-width="4"/>
+  <circle cx="256" cy="256" r="188" fill="none" stroke="#FFE98A" stroke-width="6"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#C98A00" stroke-width="2"/>
+  <!-- text -->
+  <text x="256" y="292" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="150" fill="#C0392B" stroke="#7a1d13" stroke-width="4" paint-order="stroke">$SPAM</text>
+  <text x="256" y="290" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="150" fill="#FF4D6D">$SPAM</text>
+  <!-- sparkles -->
+  <g fill="#fff">
+    <path d="M150 150 l8 22 22 8 -22 8 -8 22 -8 -22 -22 -8 22 -8z"/>
+    <path d="M372 336 l6 16 16 6 -16 6 -6 16 -6 -16 -16 -6 16 -6z"/>
+  </g>
 </svg>
