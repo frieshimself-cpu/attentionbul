@@ -22,9 +22,9 @@ async function spendableLamports(treasury: Keypair): Promise<bigint> {
   return balance > config.reserveLamports ? balance - config.reserveLamports : 0n;
 }
 
-/** How many pairs the reward budget (pairSpam bucket) can currently fund. */
+/** How many pairs the reward budget (spam bucket) can currently fund. */
 function budgetRunway(state: BotState): number {
-  return Number(getBucket(state, 'pairSpam') / launchCostLamports());
+  return Number(getBucket(state, 'spam') / launchCostLamports());
 }
 
 /**
@@ -55,12 +55,11 @@ async function interruptibleSleep(totalSec: number): Promise<void> {
 async function claimIntoBudget(treasury: Keypair, state: BotState): Promise<bigint> {
   const claimed = await claimRewards(treasury); // returns 0 unless >= MIN_CLAIM_SOL
   if (claimed > 0n) {
-    const toSpam = BigInt(Math.floor(Number(claimed) * config.spamRewardFraction));
-    creditBuckets(state, { pairSpam: toSpam, bagworkers: claimed - toSpam });
+    creditBuckets(state, { spam: claimed }); // 100% funds trench spam
     state.totalClaimedLamports = (BigInt(state.totalClaimedLamports) + claimed).toString();
     recordClaim(state, claimed, Date.now());
     if (!config.dryRun) saveState(state);
-    log(`engine: claimed ${lamportsToSol(claimed).toFixed(4)} SOL -> ${lamportsToSol(toSpam).toFixed(4)} to spam budget`);
+    log(`engine: claimed ${lamportsToSol(claimed).toFixed(4)} SOL -> spam budget`);
   }
   return claimed;
 }
@@ -90,7 +89,7 @@ export async function runSpamEngine(
 
   // Optional one-time bootstrap from principal for a fast start.
   if (config.spamSeedLamports > 0n && !state.spamSeeded) {
-    creditBuckets(state, { pairSpam: config.spamSeedLamports, bagworkers: 0n });
+    creditBuckets(state, { spam: config.spamSeedLamports });
     state.spamSeeded = true;
     if (!config.dryRun) saveState(state);
     log(`engine: seeded spam budget with ${lamportsToSol(config.spamSeedLamports).toFixed(4)} SOL from principal`);
@@ -114,7 +113,7 @@ export async function runSpamEngine(
 
       if (runway < 1 || spendable < launchCostLamports()) {
         if (capped) { log('engine: reward budget empty — stopping (capped run).'); break; }
-        log(`engine: budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL / spendable ` +
+        log(`engine: budget ${lamportsToSol(getBucket(state, 'spam')).toFixed(4)} SOL / spendable ` +
           `${lamportsToSol(spendable).toFixed(4)} SOL — waiting for creator fees...`);
         await interruptibleSleep(Math.min(c.maxIntervalSec, c.claimEverySec));
         continue;
@@ -129,12 +128,12 @@ export async function runSpamEngine(
       if (burst < 1) { await interruptibleSleep(c.intervalSec); continue; }
 
       const intervalSec = throttleIntervalSec(runway, c);
-      log(`engine: bursting ${burst} in parallel (budget ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL = ${runway} pairs, next in ${intervalSec}s)`);
+      log(`engine: bursting ${burst} in parallel (budget ${lamportsToSol(getBucket(state, 'spam')).toFixed(4)} SOL = ${runway} pairs, next in ${intervalSec}s)`);
 
       // Debit the whole burst up-front, then fire all launches CONCURRENTLY.
       // Safe because every shared-state write (saveState, keystore, count++) is
       // synchronous — no interleaving mid-write in Node's single thread.
-      if (!config.dryRun) { for (let i = 0; i < burst; i++) debitBucket(state, 'pairSpam', cost); saveState(state); }
+      if (!config.dryRun) { for (let i = 0; i < burst; i++) debitBucket(state, 'spam', cost); saveState(state); }
 
       const results = await Promise.allSettled(
         Array.from({ length: burst }, () => launchSpamPair(treasury, state))
@@ -147,7 +146,7 @@ export async function runSpamEngine(
         log(`engine: launch failed${funded ? ' after funding (recover via sweep)' : ' (budget refunded)'}: ${(r.reason as Error)?.message}`);
         ledger({ action: 'engineLaunchError', funded: !!funded, error: (r.reason as Error)?.message });
       }
-      if (!config.dryRun && refund > 0n) { creditBuckets(state, { pairSpam: refund, bagworkers: 0n }); saveState(state); }
+      if (!config.dryRun && refund > 0n) { creditBuckets(state, { spam: refund }); saveState(state); }
 
       if (capped && launched >= maxLaunches!) { log(`engine: reached launch cap (${launched}) — stopping.`); break; }
 

@@ -45,7 +45,7 @@ async function status() {
     ]);
   } catch { /* RPC hiccup — show last-known 0s rather than crash the panel */ }
 
-  const budget = getBucket(state, 'pairSpam');
+  const budget = getBucket(state, 'spam');
   const cost = launchCostLamports();
   const runway = Number(budget / cost);
   const c = getControl();
@@ -56,7 +56,7 @@ async function status() {
   return {
     dryRun: config.dryRun,
     treasury: creator.publicKey.toBase58(),
-    mint: config.bullpostMint || null,
+    mint: config.coinMint || null,
     balanceSol: lamportsToSol(balance),
     reserveSol: lamportsToSol(config.reserveLamports),
     spendableSol: lamportsToSol(balance > config.reserveLamports ? balance - config.reserveLamports : 0n),

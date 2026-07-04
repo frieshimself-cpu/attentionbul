@@ -120,18 +120,21 @@ export interface LaunchResult {
 
 export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<LaunchResult> {
   const funding = launchCostLamports();
-  // A fresh, slightly-different name/ticker each launch (same image, no links).
-  const { name, symbol } = varyName(config.spamTokenName);
+  // Every trench pair is the runner: "The Black Bull" ($ANSEM). Identical by
+  // default (that's the concept — flood with THIS coin); SPAM_VARY_NAME=true
+  // slightly varies it if you'd rather they not be exact clones.
+  const { name, symbol } = config.spamVaryName
+    ? varyName(config.spamTokenName)
+    : { name: config.spamTokenName, symbol: config.spamTokenSymbol };
 
   if (config.dryRun) {
-    log(`spam: would generate a fresh dev wallet, fund it ${lamportsToSol(funding).toFixed(4)} SOL, ` +
-      `and launch "${name}" ($${symbol}) #${state.spamLaunchCount + 1}` +
-      (config.spamDevBuySol > 0 ? ` + ${config.spamDevBuySol} SOL dev buy` : ' (create-only)'));
+    log(`spam: would launch "${name}" ($${symbol}) #${state.spamLaunchCount + 1}, ` +
+      `funding a fresh dev wallet ${lamportsToSol(funding).toFixed(4)} SOL`);
     ledger({ action: 'spamLaunch', dryRun: true, name, symbol, funding: funding.toString() });
     return { mint: null, funded: false };
   }
 
-  // Pre-funding: pin metadata. If this throws, no SOL has moved (funded=false).
+  // Pre-funding: pin/resolve metadata. If this throws, no SOL has moved (funded=false).
   const uri = await getMetadataUri(state, name, symbol);
 
   // Fresh dev wallet. Persist the key BEFORE funding so a crash can't strand SOL.

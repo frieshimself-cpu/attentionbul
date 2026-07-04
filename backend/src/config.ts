@@ -82,11 +82,10 @@ export function livePreset(): LivePreset {
 
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
- * 50% pair spam / 50% bagworker army.
+ * 100% pair spam — flood the trenches with new pairs of the runner (ANSEM).
  */
 export const ALLOCATION_BPS = {
-  pairSpam: 5_000,
-  bagworkers: 5_000,
+  spam: 10_000,
 } as const;
 
 export type Bucket = keyof typeof ALLOCATION_BPS;
@@ -94,8 +93,8 @@ export type Bucket = keyof typeof ALLOCATION_BPS;
 export const config = {
   rpcUrl: envStr('RPC_URL', 'https://api.mainnet-beta.solana.com'),
   creatorWalletSecret: envStr('CREATOR_WALLET_SECRET', ''),
-  bullpostMint: process.env.BULLPOST_MINT ?? '',
-  bagworkerWallet: process.env.BAGWORKER_WALLET ?? '',
+  // The runner's mint (CA). COIN_MINT preferred; BULLPOST_MINT kept for back-compat.
+  coinMint: process.env.COIN_MINT ?? process.env.BULLPOST_MINT ?? '',
 
   dryRun: envBool('DRY_RUN', true),
   cycleMinutes: envNum('CYCLE_MINUTES', 30),
@@ -105,8 +104,11 @@ export const config = {
   spamDevBuySol: envNum('SPAM_DEV_BUY_SOL', 0),
   spamMaxLaunchesPerCycle: envNum('SPAM_MAX_LAUNCHES_PER_CYCLE', 3),
   spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.png'),
-  spamTokenName: envStr('SPAM_TOKEN_NAME', '$BULLPOST'),
-  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'BULLPOST'),
+  spamTokenName: envStr('SPAM_TOKEN_NAME', 'The Black Bull'),
+  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'ANSEM'),
+  // Vary the pair name slightly per launch? Off = every trench pair is an
+  // identical clone of the runner (the point: flood with THIS coin).
+  spamVaryName: envBool('SPAM_VARY_NAME', false),
   pinataJwt: process.env.PINATA_JWT ?? '',
   // If set, reuse this already-pinned metadata URI for every launch instead of
   // pinning fresh via Pinata. Lets the engine run with no Pinata key at all.
@@ -140,14 +142,11 @@ export const config = {
 } as const;
 
 /**
- * BULLPOST_MINT (used only to stamp the official CA into spam metadata) and
- * BAGWORKER_WALLET may be unset pre-launch — the cycle skips/omits those with
- * a warning. Anything that IS set must be well-formed.
+ * COIN_MINT may be unset pre-launch. Anything that IS set must be well-formed.
  */
 export function validateLiveConfig(): void {
   const total = Object.values(ALLOCATION_BPS).reduce((a, b) => a + b, 0);
   if (total !== 10_000) throw new Error(`ALLOCATION_BPS must sum to 10000, got ${total}`);
   if (!config.creatorWalletSecret) throw new Error('CREATOR_WALLET_SECRET is required');
-  if (config.bullpostMint) new PublicKey(config.bullpostMint); // throws if malformed
-  if (config.bagworkerWallet) new PublicKey(config.bagworkerWallet);
+  if (config.coinMint) new PublicKey(config.coinMint); // throws if malformed
 }

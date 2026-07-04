@@ -5,7 +5,7 @@ export type Allocation = Record<Bucket, bigint>;
 /**
  * Split an amount of lamports across the allocation buckets using integer
  * basis-point math. Any rounding remainder (at most a few lamports) goes to
- * the largest bucket (pairSpam) so the total always adds up exactly.
+ * the spam bucket so the total always adds up exactly.
  */
 export function splitLamports(total: bigint): Allocation {
   if (total < 0n) throw new Error(`Cannot split negative amount: ${total}`);
@@ -16,7 +16,7 @@ export function splitLamports(total: bigint): Allocation {
     out[bucket] = share;
     assigned += share;
   }
-  out.pairSpam += total - assigned;
+  out.spam += total - assigned;
   return out;
 }
 

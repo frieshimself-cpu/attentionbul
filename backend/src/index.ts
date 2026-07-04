@@ -9,14 +9,11 @@ import { splitLamports } from './split.js';
 import { loadState, saveState, getBucket, creditBuckets, debitBucket, rewardRatePerHour, BotState } from './state.js';
 import { connection } from './rpc.js';
 import { claimRewards, getClaimable } from './claim.js';
-import { payBagworkers } from './payroll.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
 import { runSpamEngine, throttleIntervalSec } from './engine.js';
 import { sweepDevWallets } from './sweep.js';
 import { loadDevWallets } from './keystore.js';
 import { log, ledger } from './log.js';
-
-const MIN_PAYROLL_LAMPORTS = solToLamports(0.01);
 
 /** SOL available for spending right now, keeping the fee/rent reserve intact. */
 async function spendable(creator: Keypair): Promise<bigint> {
@@ -27,60 +24,30 @@ async function spendable(creator: Keypair): Promise<bigint> {
 async function runCycle(creator: Keypair, state: BotState): Promise<void> {
   log(`===== cycle start${config.dryRun ? ' (DRY RUN — nothing will be sent)' : ''} =====`);
 
-  // 1. Claim creator rewards and credit the buckets 50/50.
+  // 1. Claim creator rewards — 100% funds trench spam.
   const claimed = await claimRewards(creator);
   if (claimed >= config.minCycleLamports) {
     const split = splitLamports(claimed);
-    log(
-      `split: +${lamportsToSol(split.pairSpam).toFixed(4)} pairSpam, ` +
-        `+${lamportsToSol(split.bagworkers).toFixed(4)} bagworkers`
-    );
+    log(`split: +${lamportsToSol(split.spam).toFixed(4)} to spam budget (100%)`);
     if (!config.dryRun) {
       creditBuckets(state, split);
       state.totalClaimedLamports = (BigInt(state.totalClaimedLamports) + claimed).toString();
       saveState(state);
-    } else {
-      ledger({ action: 'split', dryRun: true, claimed: claimed.toString(), split: { pairSpam: split.pairSpam.toString(), bagworkers: split.bagworkers.toString() } });
     }
   } else if (claimed > 0n) {
     log(`claim below MIN_CYCLE_SOL threshold — leaving it in the vault for next cycle`);
   }
 
-  // 2. Bagworker payroll (25%): forward the bucket as SOL.
-  const payrollBucket = getBucket(state, 'bagworkers');
-  if (!config.bagworkerWallet) {
-    if (payrollBucket > 0n) log('payroll: BAGWORKER_WALLET not set — skipping');
-  } else if (payrollBucket >= MIN_PAYROLL_LAMPORTS) {
-    const amount = payrollBucket <= (await spendable(creator)) ? payrollBucket : 0n;
-    if (amount === 0n) {
-      log('payroll: wallet balance below bucket + reserve — deferring');
-    } else {
-      if (!config.dryRun) {
-        debitBucket(state, 'bagworkers', amount);
-        saveState(state);
-      }
-      try {
-        await payBagworkers(creator, amount);
-      } catch (err) {
-        log(`payroll failed: ${(err as Error).message} — re-crediting bucket`);
-        if (!config.dryRun) {
-          creditBuckets(state, { pairSpam: 0n, bagworkers: amount });
-          saveState(state);
-        }
-      }
-    }
-  }
-
-  // 3. Pair spam engine (50%): launch billboards while the bucket affords them.
+  // 2. Spam the trenches while the budget affords it.
   const costPerLaunch = launchCostLamports();
   let launches = 0;
   while (
     launches < config.spamMaxLaunchesPerCycle &&
-    getBucket(state, 'pairSpam') >= costPerLaunch &&
+    getBucket(state, 'spam') >= costPerLaunch &&
     (await spendable(creator)) >= costPerLaunch
   ) {
     if (!config.dryRun) {
-      debitBucket(state, 'pairSpam', costPerLaunch);
+      debitBucket(state, 'spam', costPerLaunch);
       saveState(state);
     }
     try {
@@ -89,14 +56,14 @@ async function runCycle(creator: Keypair, state: BotState): Promise<void> {
     } catch (err) {
       log(`spam launch failed: ${(err as Error).message} — re-crediting bucket`);
       if (!config.dryRun) {
-        creditBuckets(state, { pairSpam: costPerLaunch, bagworkers: 0n });
+        creditBuckets(state, { spam: costPerLaunch });
         saveState(state);
       }
       break; // don't hammer a failing endpoint
     }
     if (config.dryRun) launches++; // dry-run would loop forever otherwise
   }
-  if (launches > 0) log(`spam: ${launches} billboard launch(es) this cycle`);
+  if (launches > 0) log(`spam: ${launches} launch(es) this cycle`);
 
   state.lastCycleAt = new Date().toISOString();
   if (!config.dryRun) saveState(state);
@@ -106,12 +73,9 @@ async function runCycle(creator: Keypair, state: BotState): Promise<void> {
 
 function printStatus(state: BotState): void {
   log(
-    `buckets: pairSpam ${lamportsToSol(getBucket(state, 'pairSpam')).toFixed(4)} SOL | ` +
-      `bagworkers ${lamportsToSol(getBucket(state, 'bagworkers')).toFixed(4)} SOL`
-  );
-  log(
-    `lifetime: claimed ${lamportsToSol(BigInt(state.totalClaimedLamports)).toFixed(4)} SOL, ` +
-      `${state.spamLaunchCount} billboard launches, last cycle ${state.lastCycleAt ?? 'never'}`
+    `spam budget: ${lamportsToSol(getBucket(state, 'spam')).toFixed(4)} SOL | ` +
+      `lifetime: claimed ${lamportsToSol(BigInt(state.totalClaimedLamports)).toFixed(4)} SOL, ` +
+      `${state.spamLaunchCount} launches, last cycle ${state.lastCycleAt ?? 'never'}`
   );
 }
 
@@ -122,7 +86,7 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
     getClaimable(treasury),
   ]);
   const spendable = balance > config.reserveLamports ? balance - config.reserveLamports : 0n;
-  const budget = getBucket(state, 'pairSpam');
+  const budget = getBucket(state, 'spam');
   const runway = Number(budget / launchCostLamports());
   const lp = getControl();
   const interval = throttleIntervalSec(runway);
@@ -132,7 +96,7 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   const wallets = loadDevWallets();
   const unswept = wallets.filter((w) => w.status !== 'swept').length;
 
-  log('================ $BULLPOST bot status ================');
+  log('=========== The Black Bull ($ANSEM) — trench spam ===========');
   log(`treasury:      ${treasury.publicKey.toBase58()}`);
   log(`balance:       ${lamportsToSol(balance).toFixed(4)} SOL  (spendable ${lamportsToSol(spendable).toFixed(4)}, reserve ${lamportsToSol(config.reserveLamports).toFixed(4)})`);
   log(`claimable:     ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
@@ -180,7 +144,7 @@ async function main(): Promise<void> {
   // Offline status (no wallet needed): state file only.
   if (args.includes('--status') && !config.creatorWalletSecret) {
     printStatus(state);
-    log('allocation: 50% pair spam / 50% bagworker army');
+    log('allocation: 100% creator rewards → trench spam (The Black Bull / $ANSEM)');
     return;
   }
 

@@ -1,59 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="BULLPOST bull mascot wearing a red $BULLPOST cap, holding a megaphone">
-  <g stroke="#1D1610" stroke-width="9" stroke-linejoin="round" stroke-linecap="round">
-    <!-- tail -->
-    <path d="M150 428 Q98 446 92 406 Q90 386 110 378" fill="none"/>
-    <ellipse cx="103" cy="369" rx="16" ry="25" fill="#1D1610" transform="rotate(-38 103 369)"/>
-    <!-- body -->
-    <path d="M138 462 Q118 352 256 346 Q394 352 374 462 Q328 486 256 486 Q184 486 138 462 Z" fill="#AC7950"/>
-    <!-- feet -->
-    <ellipse cx="166" cy="472" rx="40" ry="24" fill="#1D1610"/>
-    <ellipse cx="346" cy="472" rx="40" ry="24" fill="#1D1610"/>
-    <!-- megaphone handle -->
-    <rect x="322" y="424" width="28" height="48" rx="13" fill="#D7262C"/>
-    <!-- megaphone cone -->
-    <path d="M306 392 L398 358 L398 450 L306 434 Z" fill="#D7262C"/>
-    <!-- megaphone bell -->
-    <ellipse cx="402" cy="404" rx="32" ry="54" fill="#D7262C"/>
-    <ellipse cx="410" cy="404" rx="27" ry="47" fill="#F4F1EC"/>
-    <ellipse cx="417" cy="404" rx="13" ry="23" fill="#DAD4CC"/>
-    <!-- sound waves -->
-    <path d="M460 372 Q480 404 460 436" fill="none"/>
-    <path d="M478 354 Q508 404 478 454" fill="none"/>
-    <!-- paw on megaphone -->
-    <circle cx="312" cy="410" r="21" fill="#AC7950"/>
-    <!-- ears -->
-    <ellipse cx="102" cy="250" rx="36" ry="23" fill="#AC7950" transform="rotate(-24 102 250)"/>
-    <ellipse cx="410" cy="250" rx="36" ry="23" fill="#AC7950" transform="rotate(24 410 250)"/>
-    <!-- head -->
-    <ellipse cx="256" cy="222" rx="148" ry="126" fill="#AC7950"/>
-    <!-- horns -->
-    <path d="M152 192 Q94 162 90 94 Q120 102 148 136 Q162 154 166 176 Z" fill="#978A7D"/>
-    <path d="M360 192 Q418 162 422 94 Q392 102 364 136 Q350 154 346 176 Z" fill="#978A7D"/>
-    <!-- cap dome -->
-    <path d="M120 198 Q120 60 256 60 Q392 60 392 198 Z" fill="#D7262C"/>
-    <!-- cap button -->
-    <circle cx="256" cy="60" r="10" fill="#D7262C"/>
-    <!-- cap brim -->
-    <ellipse cx="256" cy="204" rx="160" ry="30" fill="#D7262C"/>
-    <!-- eyes -->
-    <g stroke="none">
-      <circle cx="196" cy="268" r="15" fill="#1D1610"/>
-      <circle cx="316" cy="268" r="15" fill="#1D1610"/>
-      <circle cx="191" cy="262" r="5" fill="#fff"/>
-      <circle cx="311" cy="262" r="5" fill="#fff"/>
-      <circle cx="201" cy="274" r="2.5" fill="#fff"/>
-      <circle cx="321" cy="274" r="2.5" fill="#fff"/>
-    </g>
-    <!-- muzzle -->
-    <rect x="178" y="290" width="156" height="84" rx="42" fill="#F2AFA5"/>
-    <g stroke="none">
-      <circle cx="228" cy="332" r="7.5" fill="#1D1610"/>
-      <circle cx="284" cy="332" r="7.5" fill="#1D1610"/>
-    </g>
-    <!-- cap text -->
-    <g stroke="none" fill="#fff" font-family="'Arial Black','Helvetica Neue',Arial,sans-serif" font-weight="900" text-anchor="middle">
-      <text x="256" y="136" font-size="46">$BULL</text>
-      <text x="256" y="180" font-size="42">POST</text>
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="The Black Bull — black bull head with gold horns">
+  <defs>
+    <radialGradient id="ring" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#1a1a1e"/>
+      <stop offset="100%" stop-color="#050506"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFE9A8"/>
+      <stop offset="45%" stop-color="#F5C542"/>
+      <stop offset="100%" stop-color="#9C701C"/>
+    </linearGradient>
+    <radialGradient id="fur" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#2b2b31"/>
+      <stop offset="70%" stop-color="#151518"/>
+      <stop offset="100%" stop-color="#0a0a0c"/>
+    </radialGradient>
+  </defs>
+
+  <!-- coin ring -->
+  <circle cx="256" cy="256" r="248" fill="url(#ring)"/>
+  <circle cx="256" cy="256" r="248" fill="none" stroke="url(#gold)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="228" fill="none" stroke="#3a2f14" stroke-width="2"/>
+
+  <!-- horns -->
+  <path d="M150 196 Q86 150 70 74 Q60 120 78 168 Q100 214 160 224 Z" fill="url(#gold)" stroke="#7A5210" stroke-width="3"/>
+  <path d="M362 196 Q426 150 442 74 Q452 120 434 168 Q412 214 352 224 Z" fill="url(#gold)" stroke="#7A5210" stroke-width="3"/>
+
+  <!-- ears -->
+  <path d="M150 232 Q112 224 96 250 Q126 262 156 256 Z" fill="url(#fur)" stroke="#000" stroke-width="2"/>
+  <path d="M362 232 Q400 224 416 250 Q386 262 356 256 Z" fill="url(#fur)" stroke="#000" stroke-width="2"/>
+
+  <!-- head -->
+  <path d="M256 214
+           Q344 214 350 292
+           Q356 356 320 398
+           Q290 430 256 432
+           Q222 430 192 398
+           Q156 356 162 292
+           Q168 214 256 214 Z" fill="url(#fur)" stroke="#000" stroke-width="3"/>
+
+  <!-- forelock -->
+  <path d="M212 226 Q256 210 300 226 Q288 250 256 252 Q224 250 212 226 Z" fill="#0c0c0e"/>
+
+  <!-- brow -->
+  <path d="M196 300 Q222 286 244 300" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round"/>
+  <path d="M268 300 Q290 286 316 300" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- glowing gold eyes -->
+  <ellipse cx="220" cy="312" rx="17" ry="12" fill="url(#gold)"/>
+  <ellipse cx="292" cy="312" rx="17" ry="12" fill="url(#gold)"/>
+  <ellipse cx="220" cy="312" rx="7" ry="9" fill="#3a2a08"/>
+  <ellipse cx="292" cy="312" rx="7" ry="9" fill="#3a2a08"/>
+
+  <!-- snout -->
+  <path d="M210 356 Q256 344 302 356 Q312 392 256 402 Q200 392 210 356 Z" fill="#232329" stroke="#000" stroke-width="2"/>
+  <ellipse cx="230" cy="374" rx="9" ry="7" fill="#0a0a0c"/>
+  <ellipse cx="282" cy="374" rx="9" ry="7" fill="#0a0a0c"/>
+  <!-- gold nose ring -->
+  <path d="M240 392 Q256 410 272 392" fill="none" stroke="url(#gold)" stroke-width="6"/>
+  <circle cx="256" cy="404" r="12" fill="none" stroke="url(#gold)" stroke-width="6"/>
 </svg>
