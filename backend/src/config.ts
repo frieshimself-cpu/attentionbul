@@ -69,7 +69,7 @@ export const config = {
   slippageBps: envNum('SLIPPAGE_BPS', 300),
 
   // ---- throttled spam engine ----
-  spamBurstSize: envNum('SPAM_BURST_SIZE', 3),
+  spamBurstSize: envNum('SPAM_BURST_SIZE', 2),
   spamMinIntervalSec: envNum('SPAM_MIN_INTERVAL_SEC', 5),
   spamMaxIntervalSec: envNum('SPAM_MAX_INTERVAL_SEC', 120),
   spamFullSpeedRunway: envNum('SPAM_FULL_SPEED_RUNWAY', 25),
