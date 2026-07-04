@@ -32,6 +32,29 @@ export function lamportsToSol(lamports: bigint): number {
 }
 
 /**
+ * Cadence presets — the main dial for how aggressively the engine spams.
+ * Each sets the PEAK rate (burst / minInterval); the rewards-paced throttle
+ * only reaches that peak while the budget is deep, and slows toward maxInterval
+ * as fees thin. `sustainSolPerHr` is roughly the fee income needed to hold the
+ * peak indefinitely (peak pairs/hr × ~0.0107 SOL/pair).
+ */
+export const SPAM_PRESETS = {
+  high: { burst: 2, minInterval: 5, maxInterval: 120, fullSpeedRunway: 25 }, // 2/5s = 1,440/hr, ~15.4 SOL/hr
+  medium: { burst: 1, minInterval: 15, maxInterval: 300, fullSpeedRunway: 15 }, // 1/15s = 240/hr, ~2.6 SOL/hr
+  low: { burst: 1, minInterval: 60, maxInterval: 600, fullSpeedRunway: 8 }, // 1/60s = 60/hr, ~0.6 SOL/hr
+} as const;
+
+export type SpamPreset = keyof typeof SPAM_PRESETS;
+
+export function resolvePreset(name: string | undefined): SpamPreset {
+  const n = (name ?? 'medium').toLowerCase();
+  return n in SPAM_PRESETS ? (n as SpamPreset) : 'medium';
+}
+
+const activePreset = resolvePreset(process.env.SPAM_PRESET);
+const preset = SPAM_PRESETS[activePreset];
+
+/**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
  * 50% pair spam / 50% bagworker army.
  */
@@ -69,10 +92,13 @@ export const config = {
   slippageBps: envNum('SLIPPAGE_BPS', 300),
 
   // ---- throttled spam engine ----
-  spamBurstSize: envNum('SPAM_BURST_SIZE', 2),
-  spamMinIntervalSec: envNum('SPAM_MIN_INTERVAL_SEC', 5),
-  spamMaxIntervalSec: envNum('SPAM_MAX_INTERVAL_SEC', 120),
-  spamFullSpeedRunway: envNum('SPAM_FULL_SPEED_RUNWAY', 25),
+  // SPAM_PRESET (high|medium|low) is the main dial; individual SPAM_* vars below
+  // override the preset if you set them explicitly.
+  spamPreset: activePreset,
+  spamBurstSize: envNum('SPAM_BURST_SIZE', preset.burst),
+  spamMinIntervalSec: envNum('SPAM_MIN_INTERVAL_SEC', preset.minInterval),
+  spamMaxIntervalSec: envNum('SPAM_MAX_INTERVAL_SEC', preset.maxInterval),
+  spamFullSpeedRunway: envNum('SPAM_FULL_SPEED_RUNWAY', preset.fullSpeedRunway),
   spamClaimEverySec: envNum('SPAM_CLAIM_EVERY_SEC', 300),
   // Fraction of each claim that funds spam (1.0 = all of it; 0.5 keeps half for
   // bagworkers). The spam engine only ever spends this reward budget — never

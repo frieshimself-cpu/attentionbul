@@ -1,5 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Keypair } from '@solana/web3.js';
-import { config, lamportsToSol, solToLamports, validateLiveConfig } from './config.js';
+import { config, lamportsToSol, solToLamports, validateLiveConfig, SPAM_PRESETS, resolvePreset } from './config.js';
 import { loadKeypair } from './wallet.js';
 import { splitLamports } from './split.js';
 import { loadState, saveState, getBucket, creditBuckets, debitBucket, rewardRatePerHour, BotState } from './state.js';
@@ -133,9 +136,28 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   log(`claimable:     ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
   log(`spam budget:   ${lamportsToSol(budget).toFixed(4)} SOL = ${runway} pairs queued (funded by ${Math.round(config.spamRewardFraction * 100)}% of rewards)`);
   log(`reward rate:   ${lamportsToSol(ratePerHour).toFixed(4)} SOL/hr in fees  ->  ~${pairsPerHour} pairs/hr sustainable`);
+  log(`preset:        ${config.spamPreset.toUpperCase()}  (peak burst ${config.spamBurstSize} every ${config.spamMinIntervalSec}s)`);
   log(`cadence now:   burst ${config.spamBurstSize} every ${interval}s (min ${config.spamMinIntervalSec}s / max ${config.spamMaxIntervalSec}s)`);
   log(`launched:      ${state.spamLaunchCount} lifetime | dev wallets ${wallets.length} (${unswept} unswept — 'npm run sweep')`);
   log('======================================================');
+}
+
+/** Write SPAM_PRESET into .env so a switch survives restarts. */
+function setPreset(level: string): void {
+  const preset = resolvePreset(level);
+  if (preset !== level.toLowerCase()) {
+    log(`unknown preset "${level}" — use one of: ${Object.keys(SPAM_PRESETS).join(', ')}`);
+    return;
+  }
+  const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env');
+  let lines: string[] = [];
+  try { lines = fs.readFileSync(envPath, 'utf8').split('\n'); } catch { /* new file */ }
+  const idx = lines.findIndex((l) => l.startsWith('SPAM_PRESET='));
+  if (idx >= 0) lines[idx] = `SPAM_PRESET=${preset}`;
+  else lines.push(`SPAM_PRESET=${preset}`);
+  fs.writeFileSync(envPath, lines.join('\n'), { mode: 0o600 });
+  const p = SPAM_PRESETS[preset];
+  log(`preset set to ${preset.toUpperCase()} — peak ${p.burst} pair(s) every ${p.minInterval}s. Restart the engine to apply.`);
 }
 
 async function main(): Promise<void> {
@@ -143,6 +165,13 @@ async function main(): Promise<void> {
   const state = loadState();
   const maxArg = args.indexOf('--max');
   const maxLaunches = maxArg >= 0 ? Number(args[maxArg + 1]) : undefined;
+
+  // Switch cadence preset (no wallet needed): npm run preset high|medium|low
+  const presetArg = args.indexOf('--preset');
+  if (presetArg >= 0) {
+    setPreset(args[presetArg + 1] ?? '');
+    return;
+  }
 
   // Offline status (no wallet needed): state file only.
   if (args.includes('--status') && !config.creatorWalletSecret) {

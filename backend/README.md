@@ -86,6 +86,23 @@ npm run spam -- --max 10     # bounded run — launch 10 then stop (great for te
 npm run sweep                # reclaim leftover SOL from every used dev wallet
 ```
 
+### Cadence presets — the main dial
+
+Switch aggressiveness with one command (writes `SPAM_PRESET` to `.env`; restart
+the engine to apply):
+
+```bash
+npm run preset high      # 2 pairs / 5s peak   (~1,440/hr; needs ~15 SOL/hr in fees to sustain)
+npm run preset medium    # 1 pair  / 15s peak  (~240/hr;   needs ~2.6 SOL/hr)
+npm run preset low       # 1 pair  / 60s peak  (~60/hr;    needs ~0.6 SOL/hr)
+```
+
+These set the **peak** cadence. Because the engine is rewards-paced, it only
+reaches the peak while the reward budget is deep — otherwise it auto-slows to
+whatever your fee income supports. `npm run status` shows the active preset and
+the current (throttled) cadence. Advanced users can still override individual
+`SPAM_BURST_SIZE` / `SPAM_MIN_INTERVAL_SEC` / … knobs in `.env`.
+
 `npm run status` is the management view — treasury balance, claimable fees,
 runway (# pairs affordable), the current cadence at this balance, lifetime
 launches, and how many dev wallets are pending sweep.
