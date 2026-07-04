@@ -12,6 +12,7 @@
     "claim": "tsx src/index.ts --claim",
     "launch-one": "tsx src/index.ts --launch-one",
     "panel": "tsx src/server.ts",
+    "set": "tsx src/set.ts",
     "spam": "tsx src/index.ts --spam",
     "sweep": "tsx src/index.ts --sweep",
     "preset": "tsx src/index.ts --preset",

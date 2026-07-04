@@ -57,6 +57,27 @@ You'll see the control panel — START/STOP, speed and amount sliders, live stat
   and make sure a metadata source is set (ask in chat — it's one line). Then
   `npm run panel` again.
 
+## Changing speed / frequency / claiming — one command, applies instantly
+
+While the bot is running (panel or `npm run spam`), open a **second** terminal in
+`backend` and use `npm run set`. Changes hit the live engine within ~1 second, no
+restart:
+
+```bash
+npm run set speed 3 amount 5     # 5 new pairs every 3 seconds (faster + more)
+npm run set speed 30 amount 1    # slow down: 1 pair every 30s
+npm run set claim 5              # claim creator fees every 5 seconds
+npm run set off                  # pause launching
+npm run set on                   # resume
+npm run set                      # show current settings
+```
+
+- **amount** = pairs per burst · **speed** = seconds between bursts (lower = faster)
+- **claim** = how often it claims fees
+- You can combine: `npm run set speed 2 amount 6 claim 5`
+
+(These are the same knobs as the panel sliders — use whichever is handier.)
+
 ## Notes
 
 - The panel is **localhost only** — only your computer can open it. Nobody else
