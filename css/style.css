@@ -110,12 +110,15 @@ h3 { font-size: 1.35rem; margin-bottom: 0.5rem; letter-spacing: 0.03em; }
 .nav-burger span { display: block; width: 26px; height: 3px; background: var(--gold); margin: 5px 0; border-radius: 2px; }
 
 /* ---------- hero ---------- */
-.hero { position: relative; overflow: hidden; }
+.hero {
+  position: relative; overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(8,8,10,0.74) 0%, rgba(8,8,10,0.88) 55%, var(--black) 100%),
+    url("../assets/herd.png") center 18% / cover no-repeat;
+}
 .hero::before {
   content: ""; position: absolute; inset: 0;
-  background:
-    radial-gradient(60% 50% at 78% 30%, rgba(245, 197, 66, 0.12), transparent 70%),
-    radial-gradient(50% 40% at 20% 80%, rgba(120, 80, 255, 0.08), transparent 70%);
+  background: radial-gradient(60% 50% at 78% 34%, rgba(245, 197, 66, 0.16), transparent 70%);
   pointer-events: none;
 }
 .hero-inner {
