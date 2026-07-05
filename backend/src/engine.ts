@@ -3,7 +3,7 @@ import { config, lamportsToSol } from './config.js';
 import { connection } from './rpc.js';
 import { claimRewards } from './claim.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
-import { getControl, ControlState } from './control.js';
+import { getControl, updateControl, ControlState } from './control.js';
 import {
   BotState,
   saveState,
@@ -15,6 +15,14 @@ import {
 import { log, ledger } from './log.js';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Reject after `ms` so a hung RPC/SDK call (e.g. the claim) can't stall the loop. */
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)),
+  ]);
+}
 
 /** SOL the treasury can spend right now, keeping the fee/rent reserve intact. */
 async function spendableLamports(treasury: Keypair): Promise<bigint> {
@@ -80,8 +88,10 @@ export async function runSpamEngine(
   autostart = true
 ): Promise<void> {
   const capped = typeof maxLaunches === 'number' && maxLaunches >= 0;
-  const c0 = getControl();
-  if (autostart && !c0.running) c0.running = true;
+  // Persist running=true so the loop (which re-reads control.json every tick)
+  // actually runs. Setting it only on a local copy would leave the engine
+  // silently paused, since defaults() is running:false.
+  const c0 = autostart ? updateControl({ running: true }) : getControl();
 
   log(`spam engine live${config.dryRun ? ' (DRY RUN)' : ''} — ${lamportsToSol(launchCostLamports()).toFixed(4)} SOL/pair, ` +
     `funded by ${Math.round(config.spamRewardFraction * 100)}% of creator rewards` +
@@ -104,7 +114,13 @@ export async function runSpamEngine(
       if (!c.running) { await sleep(1000); continue; } // paused from the panel
 
       if (Date.now() - lastClaim > c.claimEverySec * 1000) {
-        await claimIntoBudget(treasury, state);
+        // A hung claim must never gate launches — the seed/prior budget can still
+        // fund pairs. Cap it; on timeout, skip this claim and retry next tick.
+        try {
+          await withTimeout(claimIntoBudget(treasury, state), 20_000, 'claim');
+        } catch (e) {
+          log(`engine: claim skipped this tick (${(e as Error).message}) — launching from budget`);
+        }
         lastClaim = Date.now();
       }
 
