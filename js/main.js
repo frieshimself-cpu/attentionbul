@@ -1,6 +1,6 @@
 // ===== $SPAM — maximum spam =====
 
-const CA = 'E6EFpume1z5idaQ29NsQgpW3ytWB5fvJqr7R6WVzpump';
+const CA = 'mMWqVjhnEyi4M3WctpYhbPzZc16wSWHcYSaYxVjpump';
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
