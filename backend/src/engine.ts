@@ -124,8 +124,18 @@ export async function runSpamEngine(
         lastClaim = Date.now();
       }
 
-      const runway = budgetRunway(state);
       const spendable = await spendableLamports(treasury);
+
+      // Spend-principal mode: keep the budget topped up to the wallet's spendable
+      // balance so the engine bursts off principal + rewards, not just rewards.
+      // Only ever raises the budget UP TO spendable — actual spending stays
+      // capped by the `affordable` guard below, and RESERVE_SOL is always kept.
+      if (config.spamSpendPrincipal && !config.dryRun) {
+        const budgetNow = getBucket(state, 'spam');
+        if (spendable > budgetNow) { creditBuckets(state, { spam: spendable - budgetNow }); saveState(state); }
+      }
+
+      const runway = budgetRunway(state);
 
       if (runway < 1 || spendable < launchCostLamports()) {
         if (capped) { log('engine: reward budget empty — stopping (capped run).'); break; }

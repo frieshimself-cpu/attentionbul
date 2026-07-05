@@ -139,6 +139,11 @@ export const config = {
   // Optional one-time bootstrap: seed the spam budget from principal so the
   // engine can start launching before fees have accrued. 0 = pure rewards-funded.
   spamSeedLamports: solToLamports(envNum('SPAM_SEED_SOL', 0)),
+  // Spend the wallet's whole spendable balance on spam (principal + rewards),
+  // not just recycled rewards. The RESERVE_SOL gas floor is always kept, and the
+  // per-burst spendable guard still caps actual spending. Lets you fund fast
+  // spamming by simply topping up the dev wallet.
+  spamSpendPrincipal: envBool('SPAM_SPEND_PRINCIPAL', false),
 } as const;
 
 /**
