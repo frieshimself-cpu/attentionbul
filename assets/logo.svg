@@ -1,30 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="$SPAM coin">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="$COPYCAT — cat in a photocopier">
   <defs>
-    <radialGradient id="g" cx="42%" cy="36%" r="72%">
-      <stop offset="0%" stop-color="#FFF7C2"/>
-      <stop offset="45%" stop-color="#FFD429"/>
-      <stop offset="80%" stop-color="#E8A200"/>
-      <stop offset="100%" stop-color="#9B6400"/>
-    </radialGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="50%" stop-color="#FF00CC"/>
+      <stop offset="100%" stop-color="#FFEA00"/>
+    </linearGradient>
   </defs>
-  <!-- spikes -->
-  <g fill="#FF2E63">
-    <g id="sp"><polygon points="256,4 276,60 236,60"/></g>
+  <rect width="512" height="512" rx="36" fill="url(#bg)"/>
+  <!-- paper tray under -->
+  <rect x="96" y="360" width="320" height="70" rx="10" fill="#E9EDF2" stroke="#111" stroke-width="6"/>
+  <rect x="128" y="392" width="256" height="26" rx="4" fill="#fff" stroke="#111" stroke-width="4"/>
+  <!-- copier body -->
+  <rect x="112" y="200" width="288" height="176" rx="16" fill="#F4F6F9" stroke="#111" stroke-width="8"/>
+  <!-- control panel -->
+  <rect x="300" y="228" width="78" height="40" rx="6" fill="#CFD6DE" stroke="#111" stroke-width="4"/>
+  <circle cx="316" cy="248" r="6" fill="#16a34a"/><circle cx="336" cy="248" r="6" fill="#FFC93C"/><circle cx="356" cy="248" r="6" fill="#E5484D"/>
+  <!-- lifted lid -->
+  <rect x="120" y="150" width="250" height="34" rx="10" fill="#DBE1E8" stroke="#111" stroke-width="8" transform="rotate(-8 120 167)"/>
+  <!-- scanner slot (dark) -->
+  <rect x="128" y="270" width="150" height="66" rx="6" fill="#0d1117"/>
+  <!-- cat peeking out -->
+  <g stroke="#111" stroke-width="5" stroke-linejoin="round">
+    <!-- ears -->
+    <path d="M150 300 l14 -34 20 26z" fill="#6b4f3a"/>
+    <path d="M232 300 l-12 -34 -22 24z" fill="#fff"/>
+    <!-- head -->
+    <path d="M146 322 q0 -40 46 -44 q46 4 46 44 q0 22 -46 22 q-46 0 -46 -22z" fill="#fff"/>
+    <path d="M150 316 q10 -30 40 -30 l-2 34z" fill="#6b4f3a"/>
   </g>
-  <g fill="#FF2E63">
-    <circle cx="256" cy="256" r="250"/>
+  <!-- eyes -->
+  <circle cx="176" cy="308" r="9" fill="#111"/><circle cx="208" cy="308" r="9" fill="#111"/>
+  <circle cx="179" cy="305" r="3" fill="#fff"/><circle cx="211" cy="305" r="3" fill="#fff"/>
+  <!-- nose + whiskers -->
+  <path d="M188 320 l8 0 -4 6z" fill="#FF69B4" stroke="#111" stroke-width="2"/>
+  <g stroke="#111" stroke-width="3" stroke-linecap="round">
+    <path d="M150 316 l-24 -4"/><path d="M150 324 l-24 6"/>
+    <path d="M234 316 l24 -4"/><path d="M234 324 l24 6"/>
   </g>
-  <!-- coin -->
-  <circle cx="256" cy="256" r="224" fill="#8A5A00"/>
-  <circle cx="256" cy="256" r="214" fill="url(#g)" stroke="#B97F00" stroke-width="4"/>
-  <circle cx="256" cy="256" r="188" fill="none" stroke="#FFE98A" stroke-width="6"/>
-  <circle cx="256" cy="256" r="180" fill="none" stroke="#C98A00" stroke-width="2"/>
-  <!-- text -->
-  <text x="256" y="292" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="150" fill="#C0392B" stroke="#7a1d13" stroke-width="4" paint-order="stroke">$SPAM</text>
-  <text x="256" y="290" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="150" fill="#FF4D6D">$SPAM</text>
-  <!-- sparkles -->
-  <g fill="#fff">
-    <path d="M150 150 l8 22 22 8 -22 8 -8 22 -8 -22 -22 -8 22 -8z"/>
-    <path d="M372 336 l6 16 16 6 -16 6 -6 16 -6 -16 -16 -6 16 -6z"/>
-  </g>
+  <!-- title -->
+  <text x="256" y="474" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="58" fill="#111" stroke="#fff" stroke-width="6" paint-order="stroke">$COPYCAT</text>
 </svg>
