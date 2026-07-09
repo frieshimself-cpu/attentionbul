@@ -18,7 +18,7 @@ assets/logo.svg — the $COPYCAT coin logo (used on-site and in pair metadata)
 - **Contract address** — replace the `TBA — 📢 AD SLOT RESERVED` placeholder in `#caText` (and set `const CA` in `js/main.js`) once the coin drops.
 - **Links** — the Buy / Chart / Telegram / X buttons currently point to `#`. Search `href="#"` in `index.html` and paste the real URLs.
 
-The creator-rewards allocation shown on the site: **50% new-pair spam / 50% DEX ads** — half of every fee auto-spam-launches new $COPYCAT pairs on pump.fun, the other half buys DEX ads (Dexscreener/DexView paid banners + trending boosts).
+The creator-rewards allocation shown on the site: **100% new-pair spam** — 100% of every fee auto-spam-launches new $COPYCAT pairs on pump.fun, non-stop.
 
 ## Deploying on GitHub Pages
 

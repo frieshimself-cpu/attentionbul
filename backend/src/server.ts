@@ -46,7 +46,6 @@ async function status() {
   } catch { /* RPC hiccup — show last-known 0s rather than crash the panel */ }
 
   const budget = getBucket(state, 'spam');
-  const adFund = getBucket(state, 'adFund');
   const cost = launchCostLamports();
   const runway = Number(budget / cost);
   const c = getControl();
@@ -63,7 +62,6 @@ async function status() {
     spendableSol: lamportsToSol(balance > config.reserveLamports ? balance - config.reserveLamports : 0n),
     claimableSol: lamportsToSol(claimable),
     budgetSol: lamportsToSol(budget),
-    adFundSol: lamportsToSol(adFund),
     costPerPairSol: lamportsToSol(cost),
     runway,
     currentIntervalSec: throttleIntervalSec(runway, c),

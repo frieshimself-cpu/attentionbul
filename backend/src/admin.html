@@ -132,8 +132,7 @@ function render(s){
 
   $('stats').innerHTML = [
     ['Balance', money(s.balanceSol), 'spendable '+s.spendableSol.toFixed(3)],
-    ['Spam budget (50%)', money(s.budgetSol), s.runway+' pairs queued'],
-    ['Ad fund (50%)', money(s.adFundSol||0), 'reserved for DEX ads'],
+    ['Spam budget', money(s.budgetSol), s.runway+' pairs queued'],
     ['Claimable fees', money(s.claimableSol), 'auto-claimed'],
     ['Reward rate', s.rewardSolPerHr.toFixed(3)+' SOL/hr', '~'+s.sustainablePairsPerHr+' pairs/hr'],
     ['Launched', String(s.launchedLifetime), s.devWalletsUnswept+' unswept'],

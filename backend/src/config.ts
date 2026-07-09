@@ -82,14 +82,10 @@ export function livePreset(): LivePreset {
 
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
- * $COPYCAT splits fees 50/50: half auto-spams new pairs, half is reserved to
- * buy DEX ads (Dexscreener / DexView paid banners + trending boosts). The
- * `adFund` half is tracked and held in the treasury (or forwarded to
- * DEX_ADS_WALLET) — the engine never spends it on spam.
+ * 100% of creator rewards fund new-pair spam — flood pump.fun with copies.
  */
 export const ALLOCATION_BPS = {
-  spam: 5_000,
-  adFund: 5_000,
+  spam: 10_000,
 } as const;
 
 export type Bucket = keyof typeof ALLOCATION_BPS;
@@ -110,10 +106,6 @@ export const config = {
   spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.webp'),
   spamTokenName: envStr('SPAM_TOKEN_NAME', '$COPYCAT'),
   spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'COPYCAT'),
-  // Optional: forward the 50% ad-fund half of each claim to this wallet (the one
-  // you buy DEX ads from). Unset = the ad half just accrues in the treasury and
-  // you withdraw it manually to buy ads.
-  dexAdsWallet: process.env.DEX_ADS_WALLET ?? '',
   // Vary the pair name slightly per launch? Off = every trench pair is an
   // identical clone of the runner (the point: flood with THIS coin).
   spamVaryName: envBool('SPAM_VARY_NAME', false),
@@ -163,5 +155,4 @@ export function validateLiveConfig(): void {
   if (total !== 10_000) throw new Error(`ALLOCATION_BPS must sum to 10000, got ${total}`);
   if (!config.creatorWalletSecret) throw new Error('CREATOR_WALLET_SECRET is required');
   if (config.coinMint) new PublicKey(config.coinMint); // throws if malformed
-  if (config.dexAdsWallet) new PublicKey(config.dexAdsWallet); // throws if malformed
 }
