@@ -1,35 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="$AdCoin">
-  <defs>
-    <radialGradient id="g" cx="42%" cy="36%" r="72%">
-      <stop offset="0%" stop-color="#FFF7C2"/>
-      <stop offset="45%" stop-color="#FFD429"/>
-      <stop offset="80%" stop-color="#E8A200"/>
-      <stop offset="100%" stop-color="#9B6400"/>
-    </radialGradient>
-  </defs>
-  <!-- coin -->
-  <circle cx="256" cy="256" r="250" fill="#EC008C"/>
-  <circle cx="256" cy="256" r="224" fill="#8A5A00"/>
-  <circle cx="256" cy="256" r="214" fill="url(#g)" stroke="#B97F00" stroke-width="4"/>
-  <circle cx="256" cy="256" r="188" fill="none" stroke="#FFE98A" stroke-width="6"/>
-  <circle cx="256" cy="256" r="180" fill="none" stroke="#C98A00" stroke-width="2"/>
-  <!-- "SPONSORED" mini tag -->
-  <g transform="rotate(-12 256 120)">
-    <rect x="150" y="98" width="212" height="34" rx="6" fill="#00AEEF" stroke="#000" stroke-width="4"/>
-    <text x="256" y="123" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="22" fill="#000">★ SPONSORED ★</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="$COPYCAT">
+  <rect width="512" height="512" rx="72" fill="#00AEEF"/>
+  <!-- copier slot -->
+  <rect x="70" y="300" width="372" height="150" rx="16" fill="#e9edf0" stroke="#000" stroke-width="10"/>
+  <rect x="70" y="300" width="372" height="26" fill="#000" opacity="0.75"/>
+  <!-- cat peeking out -->
+  <g stroke="#000" stroke-width="10" stroke-linejoin="round">
+    <!-- ears -->
+    <path d="M150 150 L188 236 L112 236 Z" fill="#8a6a4a"/>
+    <path d="M362 150 L400 236 L324 236 Z" fill="#fff"/>
+    <!-- head -->
+    <path d="M120 250 Q120 130 256 130 Q392 130 392 250 Q392 322 256 322 Q120 322 120 250 Z" fill="#fff"/>
+    <path d="M120 250 Q120 130 256 130 L256 322 Q120 322 120 250 Z" fill="#8a6a4a"/>
   </g>
-  <!-- big AD -->
-  <text x="256" y="322" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="180" fill="#EC008C" stroke="#5a0035" stroke-width="6" paint-order="stroke">AD</text>
-  <text x="252" y="316" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="180" fill="#FF3DAE">AD</text>
-  <!-- little cursor click -->
-  <g transform="translate(330 320) rotate(14)">
-    <path d="M0 0 L0 44 L12 33 L20 52 L30 47 L22 29 L38 29 Z" fill="#fff" stroke="#000" stroke-width="3"/>
+  <!-- eyes -->
+  <circle cx="205" cy="235" r="26" fill="#fff" stroke="#000" stroke-width="6"/>
+  <circle cx="307" cy="235" r="26" fill="#fff" stroke="#000" stroke-width="6"/>
+  <circle cx="205" cy="238" r="12" fill="#111"/>
+  <circle cx="307" cy="238" r="12" fill="#111"/>
+  <!-- nose + mouth -->
+  <path d="M242 268 L270 268 L256 282 Z" fill="#EC008C" stroke="#000" stroke-width="4"/>
+  <!-- whiskers -->
+  <g stroke="#000" stroke-width="5" stroke-linecap="round">
+    <path d="M150 262 L92 250"/><path d="M150 278 L94 286"/>
+    <path d="M362 262 L420 250"/><path d="M362 278 L418 286"/>
   </g>
   <!-- ticker -->
-  <text x="256" y="392" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="40" fill="#000">$AdCoin</text>
-  <!-- sparkles -->
-  <g fill="#fff">
-    <path d="M150 168 l8 22 22 8 -22 8 -8 22 -8 -22 -22 -8 22 -8z"/>
-    <path d="M372 356 l6 16 16 6 -16 6 -6 16 -6 -16 -16 -6 16 -6z"/>
-  </g>
+  <text x="256" y="415" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="58" fill="#fff" stroke="#000" stroke-width="6" paint-order="stroke">$COPYCAT</text>
 </svg>

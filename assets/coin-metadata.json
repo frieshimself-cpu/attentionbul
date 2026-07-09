@@ -1,7 +1,7 @@
 {
-  "name": "$AdCoin",
-  "symbol": "ADCOIN",
-  "description": "$AdCoin — the coin that is one giant advertisement. 50% of creator rewards auto-spam-launch new pairs, the other 50% buys DEX ads (Dexscreener/DexView paid banners + trending boosts). Half spam, half ads, all reach. 📢",
-  "image": "https://raw.githubusercontent.com/frieshimself-cpu/attentionbul/claude/bullpost-coin-website-fqf257/assets/logo.svg",
+  "name": "$COPYCAT",
+  "symbol": "COPYCAT",
+  "description": "$COPYCAT — a fluffy cat wedged in the office photocopier that won't stop Ctrl+C / Ctrl+V-ing itself onto pump.fun. 50% of creator rewards auto-copy new pairs, the other 50% buys DEX ads. Half copies, half ads, all cat. 🐱🖨️",
+  "image": "https://raw.githubusercontent.com/frieshimself-cpu/attentionbul/claude/bullpost-coin-website-fqf257/assets/logo.webp",
   "showName": true
 }

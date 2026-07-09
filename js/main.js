@@ -1,7 +1,7 @@
-// ===== $AdCoin — the coin that advertises itself. half spam, half ads. =====
+// ===== $COPYCAT — a cat is stuck in the copier and it will not stop printing =====
 
-// No CA yet — the ad slot is reserved. Set this when it drops.
-const CA = '2VmGNcGtY5yeNsWQs1ZFDmw3FUpvvSfvDBPjCu6Ppump';
+// No CA yet — the cat is still warming up the copier. Set this when it drops.
+const CA = '';
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
@@ -14,39 +14,41 @@ function showToast(msg) {
   toastT = setTimeout(() => toast.classList.remove('show'), 2000);
 }
 async function copyCA() {
-  if (!CA) { showToast('📢 SOON™ — the ad slot is reserved, CA dropping shortly 🖱️'); return; }
-  try { await navigator.clipboard.writeText(CA); showToast("📋 CA COPIED! now paste it into every group chat. that's an ad. 📢"); }
-  catch { showToast('📢 just buy $AdCoin'); }
+  if (!CA) { showToast('🖨️ SOON™ — the cat is still warming up the copier 🐱'); return; }
+  try { await navigator.clipboard.writeText(CA); showToast("📋 CA COPIED! now Ctrl+V it 999,999 times. Meow."); }
+  catch { showToast('🐱 just buy $COPYCAT'); }
 }
 document.getElementById('caCopy').addEventListener('click', copyCA);
 
+// Fake "copy #" counter that keeps ticking
 const vis = document.getElementById('visnum');
 let visN = 400 + Math.floor(Math.random() * 99);
 if (vis) setInterval(() => { visN += Math.floor(Math.random() * 7); vis.textContent = '#' + String(visN).padStart(6, '0'); }, 900);
 
+// Legacy center popup that respawns when closed
 const popup = document.getElementById('popup');
 const popupX = document.getElementById('popupX');
 function hidePopup() {
   popup.classList.add('hidden');
   setTimeout(() => { popup.classList.remove('hidden'); }, 6000 + Math.random() * 6000);
 }
-popupX.addEventListener('click', () => { showToast("🚫 you closed the ad but the ad did not close you. buy $AdCoin."); hidePopup(); });
+popupX.addEventListener('click', () => { showToast("😾 you closed the popup but the cat is STILL in the copier (and it knows where you live)"); hidePopup(); });
 popup.querySelector('.popup-btn').addEventListener('click', (e) => { e.preventDefault(); copyCA(); hidePopup(); });
 
 // ===================================================================
-//  AD POPUP SWARM — ads everywhere, and closing one serves more
+//  POPUP SWARM — copies everywhere, and closing one prints more
 // ===================================================================
 const layer = document.getElementById('popuplayer');
 const MAX_POPUPS = 9;
 const caBlock = CA
   ? '<span class="spop-ca" data-ca>' + CA + ' 📋</span>'
-  : '<span class="spop-ca">CONTRACT: AD SLOT RESERVED — DROPPING SOON 📢</span>';
+  : '<span class="spop-ca">CONTRACT: DROPPING SOON 🐱🖨️</span>';
 
 const TEMPLATES = [
   {
-    "head": "🎉 YOU'RE THE 1,000,000th VISITOR!",
-    "body": "Our ad targeting selected <b>YOU</b>.<br>Claim your <b>1,000,000 $AdCoin</b> in free ad-credits now.",
-    "btn": "CLAIM MY ADS 📢",
+    "head": "😻 CONGRATS — YOU'RE COPY #999,999!",
+    "body": "The copier randomly selected <b>YOU</b> as our 999,999th printout!<br>Claim your warm, freshly-photocopied bag of <b>9 FREE LIVES</b> of $COPYCAT now.",
+    "btn": "PRINT MY PRIZE 🖨️",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -54,9 +56,9 @@ const TEMPLATES = [
     "v": "v1"
   },
   {
-    "head": "🚨 YOUR CHART HAS NO ADS",
-    "body": "Your portfolio is running <b>UNsponsored</b>.<br>This is embarrassing. Fix it immediately.",
-    "btn": "SPONSOR ME 📢",
+    "head": "⚠️ PAPER JAM DETECTED IN TRAY 2",
+    "body": "There is a <b>very fluffy CAT</b> stuck in the rollers.<br>Please buy $COPYCAT to clear the jam. Do NOT pull the cat.",
+    "btn": "CLEAR JAM 😾",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -64,9 +66,9 @@ const TEMPLATES = [
     "v": "v2"
   },
   {
-    "head": "🍪 THIS SITE USES 999 COOKIES",
-    "body": "By staying you agree to be advertised at, forever, by <b>$AdCoin</b>.",
-    "btn": "ACCEPT ALL &amp; BUY",
+    "head": "🖨️ TONER CRITICALLY LOW",
+    "body": "Cyan, Magenta, Yellow & <b>CAT</b> levels are dangerously low.<br>Refill now or the cat prints in sad grayscale.",
+    "btn": "REFILL TONER 💰",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -74,9 +76,9 @@ const TEMPLATES = [
     "v": "v3"
   },
   {
-    "head": "📩 1 NEW AD IN YOUR INBOX",
-    "body": "<b>ser…</b><br>'your wallet qualifies for <b>premium ad placement</b> 👀 act now'",
-    "btn": "OPEN AD",
+    "head": "📩 1 NEW COPY IN YOUR OUTPUT TRAY",
+    "body": "The cat in the copier left you a message:<br><b>'meow. buy. meow. copy. meow.'</b>",
+    "btn": "OPEN THE TRAY",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -84,9 +86,9 @@ const TEMPLATES = [
     "v": "v4"
   },
   {
-    "head": "🪂 FREE AD CREDITS",
-    "body": "Paste the CA to claim <b>999,999 $AdCoin ad impressions</b>:<br>Offer expires never (it's an ad).",
-    "btn": "CLAIM CREDITS",
+    "head": "🪂 FREE CATDROP INCOMING",
+    "body": "Paste this into your wallet to receive <b>999,999 COPIES</b>:<br>Offer expires when the paper runs out (never).",
+    "btn": "CLAIM MY COPIES",
     "ca": true,
     "wheel": false,
     "countdown": false,
@@ -94,9 +96,9 @@ const TEMPLATES = [
     "v": "v5"
   },
   {
-    "head": "🐋 WHALE ALERT — SOMEONE BOUGHT AD SPACE",
-    "body": "<b>0xBanner</b> just bought <b>42 SOL</b> of $AdCoin ad space.<br>Don't let him own the whole billboard.",
-    "btn": "OUTBID THE WHALE",
+    "head": "🐋 WHALE ALERT — SOMEONE COPIED THE CAT",
+    "body": "<b>0xPurrrr</b> just CTRL+C'd <b>42 SOL</b> of $COPYCAT.<br>The copier is overheating. Don't let him hog all the copies.",
+    "btn": "COPY THE WHALE",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -104,9 +106,9 @@ const TEMPLATES = [
     "v": "v6"
   },
   {
-    "head": "⏳ YOUR AD SLOT EXPIRES SOON",
-    "body": "This premium trending slot resets in:<br>Do NOT lose your placement.",
-    "btn": "LOCK MY SLOT",
+    "head": "⏳ COPIER WARMING UP — PRESALE ENDS SOON",
+    "body": "The photocopier hits operating temperature and the cat stops accepting new pages in:<br>Do NOT let the cat cool down.",
+    "btn": "SECURE MY COPY",
     "ca": false,
     "wheel": false,
     "countdown": true,
@@ -114,9 +116,9 @@ const TEMPLATES = [
     "v": "v1"
   },
   {
-    "head": "🎡 SPIN THE AD-ROULETTE!",
-    "body": "Land on <b>TRENDING #1</b> to boost your bags!<br>Everyone's a winner (you're the product).",
-    "btn": "SPIN TO ADVERTISE",
+    "head": "🎡 SPIN THE COLLATE-WHEEL!",
+    "body": "Land on <b>DUPLEX</b> to DOUBLE your copies!<br>Everyone's a winner (the cat rigged it, the toner cartridge is not).",
+    "btn": "SPIN TO COPY",
     "ca": false,
     "wheel": true,
     "countdown": false,
@@ -124,9 +126,9 @@ const TEMPLATES = [
     "v": "v2"
   },
   {
-    "head": "🤖 ARE YOU AN AD-BLOCKER?",
-    "body": "Prove you love ads.<br>Select all charts with <b>a $AdCoin banner</b>.",
-    "btn": "I ❤️ ADS",
+    "head": "🤖 SECURITY CHECK: ARE YOU A COPYCAT?",
+    "body": "Prove you are not a bot.<br>Select all squares with <b>a cat wedged in a printer</b>.",
+    "btn": "I AM A COPYCAT ✔️",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -134,9 +136,9 @@ const TEMPLATES = [
     "v": "v3"
   },
   {
-    "head": "📉 YOUR COIN ISN'T TRENDING",
-    "body": "You are down bad <b>AND</b> off the trending list.<br>Only $AdCoin fixes both.",
-    "btn": "BUY TRENDING (APE)",
+    "head": "📉 YOUR PORTFOLIO IS PRINTING IN GRAYSCALE",
+    "body": "You are down bad, collated and stapled.<br>Everything you own is fading to black & white — only <b>$COPYCAT</b> is still in full color.",
+    "btn": "RESTORE COLOR (APE)",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -144,9 +146,9 @@ const TEMPLATES = [
     "v": "v4"
   },
   {
-    "head": "👀 3.7 BILLION IMPRESSIONS SERVED",
-    "body": "$AdCoin is on every chart, every group, every timeline.<br>Join the ad network or get <b>advertised AT</b>.",
-    "btn": "JOIN THE NETWORK",
+    "head": "🐱 THE CAT IS STARING AT YOU",
+    "body": "The cat in the copier will NOT get out until you buy.<br>It has been staring for 999,999 hours. <b>It will not blink first.</b>",
+    "btn": "OBEY THE CAT",
     "ca": false,
     "wheel": false,
     "countdown": false,
@@ -154,8 +156,8 @@ const TEMPLATES = [
     "v": "v5"
   },
   {
-    "head": "📢 OFFICIAL CA — SKIP THIS AD in 5…4…",
-    "body": "This is the ONE real $AdCoin. Every other listing is unsponsored spam.<br>Copy responsibly:",
+    "head": "📠 OFFICIAL CA — DO NOT REPLY-ALL",
+    "body": "This is the ONE real cat, fresh off the glass. Every other listing is a copy of a copy of a copy.<br>Ctrl+C responsibly:",
     "btn": "COPY THE CA 📋",
     "ca": true,
     "wheel": false,
@@ -187,7 +189,7 @@ function spawnPopup(t) {
     '<div class="spop-body">' + t.body + '</div>' +
     (t.ca ? caBlock : '') +
     '<span class="spop-btn">' + t.btn + '</span>' +
-    '<div class="spop-tiny">(not real. not financial advice. it is a paid advertisement. do not click.)</div>';
+    '<div class="spop-tiny">(not real. not financial advice. it is a photo of a cat in a printer. do not lick the toner.)</div>';
   layer.appendChild(el);
   place(el);
 
@@ -209,7 +211,7 @@ function spawnPopup(t) {
       for (let i = 0; i < n; i++) setTimeout(spawnPopup, rand(120, 500));
     }
   };
-  el.querySelector('.spop-x').addEventListener('click', () => { showToast("🚫 you closed the ad but the ad did not close you. buy $AdCoin."); kill(true); });
+  el.querySelector('.spop-x').addEventListener('click', () => { showToast("😾 you closed the popup but the cat is STILL in the copier (and it knows where you live)"); kill(true); });
   el.querySelector('.spop-btn').addEventListener('click', () => { copyCA(); kill(false); setTimeout(spawnPopup, rand(300, 900)); });
   const caEl = el.querySelector('[data-ca]');
   if (caEl) caEl.addEventListener('click', copyCA);
@@ -219,17 +221,17 @@ for (let i = 0; i < 3; i++) setTimeout(spawnPopup, 600 + i * 700);
 setInterval(() => { if (layer.children.length < MAX_POPUPS) spawnPopup(); }, 1900);
 
 // ===================================================================
-//  CORNER "just bought ad space" notifications
+//  CORNER "just copied" notifications
 // ===================================================================
 const notifLayer = document.getElementById('notiflayer');
-const NAMES = ["0xBanner", "cpm_chad", "trending_tina", "popup_pete", "sponsored_sam", "dexscreener_dan", "impression_ian", "clickbait_carl", "adsense_amy", "billboard_bob", "skip_ad_steve", "native_ad_nina", "retarget_rick", "pixel_pat", "sponsored.sol", "adblock_andy"];
-const NOTE_TEMPLATES = ["📢 <b>{n}</b> just bought <b>{a} SOL</b> of ad space", "📈 <b>{n}</b> boosted $AdCoin to trending with <b>{a} SOL</b>", "🖱️ <b>{n}</b> clicked the ad and aped <b>{a} SOL</b>", "💸 <b>{n}</b> bought a <b>{a} SOL</b> Dexscreener banner", "🚀 <b>{n}</b> paid <b>{a} SOL</b> to skip the ad (bought instead)", "📺 <b>{n}</b> just went full-screen with <b>{a} SOL</b>", "🔁 <b>{n}</b> retargeted <b>{a} SOL</b> back into $AdCoin", "⭐ <b>{n}</b> sponsored the trenches (+{a} SOL)"];
+const NAMES = ["toner_gawd", "0xPurrrr", "CtrlV_Chad", "meowntain", "xerox_xerxes", "fax_machine_broke", "duplex_daddy", "collate_king", "9livesape", "printnpray", "staplerhands", "reply_all_regret", "TonerTina", "copyKitty420", "WifHatWhiskers", "PrinterGoBrr"];
+const NOTE_TEMPLATES = ["🐱 <b>{n}</b> just copied <b>{a} SOL</b> of $COPYCAT", "🖨️ <b>{n}</b> smashed CTRL+V for <b>{a} SOL</b> — copier going brrr", "📄 <b>{n}</b> just printed <b>{a} SOL</b> of fresh COPIES", "🐾 <b>{n}</b> cleared a paper jam and aped <b>{a} SOL</b>", "😾 <b>{n}</b> refuses to get out of the copier ({a} SOL deep)", "📋 <b>{n}</b> pasted <b>{a} SOL</b> straight into the litter box", "⚡ <b>{n}</b> just spawned a whole NEW COPY (+{a} SOL)", "✅ <b>{n}</b> replied-all with <b>{a} SOL</b> (do not do this)"];
 function popNotif() {
   if (notifLayer.children.length > 4) return;
   const el = document.createElement('div');
   el.className = 'notif';
   const name = pick(NAMES), amt = (rand(0.3, 42)).toFixed(1);
-  el.innerHTML = pick(NOTE_TEMPLATES).replaceAll('{n}', name).replaceAll('{a}', amt);
+  el.innerHTML = pick(NOTE_TEMPLATES).replace('{n}', name).replace('{a}', amt);
   notifLayer.appendChild(el);
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 4200);
 }
@@ -237,9 +239,9 @@ setInterval(popNotif, 2600);
 setTimeout(popNotif, 1500);
 
 // ===================================================================
-//  Scattered ad stickers
+//  Scattered stickers
 // ===================================================================
-const PHRASES = ["YOUR AD HERE", "SPONSORED 📢", "CLICK HERE 👆", "AS SEEN ON EVERY CHART", "50% SPAM 50% ADS", "TRENDING #1", "SKIP AD ▶", "BUY = IMPRESSIONS", "NOW ON DEXSCREENER", "AD-FUNDED PUMP", "1000X CPM", "NO AD-BLOCK 🚫", "POP-UP APPROVED", "BANNER SZN", "LIMITED AD SLOTS", "GET ADVERTISED AT", "DOUBLE YOUR REACH", "SPONSORED BY YOU", "ADS = LIQUIDITY", "MORE ADS 📢"];
+const PHRASES = ["COPYING… 100%", "PAPER JAM = BULLISH", "TONER LOW BUY HIGH", "CTRL+C 🐱", "CTRL+V 🖨️", "MEOW", "999,999 COPIES", "HE COPYC 🐾", "NO CAP ALL CAT", "PLEASE WAIT", "GET OUT OF THE COPIER", "COLLATE THE BAGS", "REPLY-ALL", "PC LOAD LETTER", "9 LIVES 9000X", "SAME CAT, NEW PAIR", "DO NOT SCALE TO FIT", "PASTE ME PLZ 🥺", "REAL PHOTO, REAL CAT", "😾 JAMMED (still bullish)"];
 const stickerLayer = document.getElementById('stickers');
 const STCLS = ['st-a','st-b','st-c','st-d','st-e'];
 for (let i = 0; i < 24; i++) {
@@ -256,8 +258,8 @@ for (let i = 0; i < 24; i++) {
   stickerLayer.appendChild(s);
 }
 
-// Confetti: ads raining down
-const EMOJI = ["📢", "📣", "📈", "💸", "🖱️", "⭐", "🔥", "💰", "📺", "🪧", "✨"];
+// Confetti: paper + paws + cats raining out of the copier
+const EMOJI = ["📄", "🐱", "🐾", "🖨️", "😾", "📠", "📋", "🐈", "✂️", "📎", "😻"];
 function drop() {
   const e = document.createElement('div');
   e.textContent = pick(EMOJI);
@@ -268,6 +270,7 @@ function drop() {
 }
 setInterval(drop, 450);
 
+// Title screams into the tab
 const base = document.title;
 let flip = false;
-setInterval(() => { document.title = (flip = !flip) ? "📢 (1) NEW AD — BUY $AdCoin NOW 🖱️" : base; }, 900);
+setInterval(() => { document.title = (flip = !flip) ? "😾 PAPER JAM — (1) NEW COPY!! CTRL+V NOW 🖨️" : base; }, 900);

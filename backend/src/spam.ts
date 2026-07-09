@@ -96,7 +96,7 @@ async function getMetadataUri(state: BotState, name: string, symbol: string): Pr
 }
 
 /**
- * Launch one $AdCoin pair on pump.fun via PumpPortal's local
+ * Launch one $COPYCAT pair on pump.fun via PumpPortal's local
  * (self-sign) API, returning the new mint address.
  *
  * Each pair is created by its OWN fresh dev wallet (not the treasury) so
@@ -120,7 +120,7 @@ export interface LaunchResult {
 
 export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<LaunchResult> {
   const funding = launchCostLamports();
-  // Every trench pair is $AdCoin. Identical by default (that's the concept —
+  // Every trench pair is $COPYCAT. Identical by default (that's the concept —
   // flood with THIS coin); SPAM_VARY_NAME=true slightly varies it if you'd
   // rather they not be exact clones.
   const { name, symbol } = config.spamVaryName

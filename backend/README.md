@@ -1,4 +1,4 @@
-# $AdCoin rewards bot
+# $COPYCAT rewards bot
 
 Self-hosted bot that turns pump.fun creator rewards into spam + ads, on a loop:
 
@@ -8,7 +8,7 @@ claim creator rewards (bonding curve + PumpSwap vaults)
         ▼
  split 50 / 50 into persistent buckets
         │
-        ├─ 50%  Pair Spam Engine → launches new $AdCoin pairs on pump.fun,
+        ├─ 50%  Pair Spam Engine → launches new $COPYCAT pairs on pump.fun,
         │                          non-stop, each from a fresh throwaway wallet
         └─ 50%  Ad Fund          → reserved (or forwarded to DEX_ADS_WALLET) to
                                    buy DEX ads: Dexscreener/DexView banners + trending
@@ -36,11 +36,11 @@ You need:
 
 | Thing | Where |
 | --- | --- |
-| `CREATOR_WALLET_SECRET` | The wallet that launched $AdCoin (it accrues the creator rewards). Phantom base58 export or solana-keygen JSON array. |
+| `CREATOR_WALLET_SECRET` | The wallet that launched $COPYCAT (it accrues the creator rewards). Phantom base58 export or solana-keygen JSON array. |
 | `RPC_URL` | Free Helius endpoint recommended (public RPC drops transactions under load). |
 | `SPAM_METADATA_URI` | Easiest metadata path — reuse an already-pinned metadata JSON (no key needed). Or set `PINATA_JWT` instead. |
 | `PINATA_JWT` | Optional. Free at pinata.cloud — pins token metadata to IPFS if you're not using `SPAM_METADATA_URI` (pump.fun closed their own upload endpoint). |
-| `COIN_MINT` | Optional. The official $AdCoin CA, once launched — only used to stamp the CA into spam metadata. |
+| `COIN_MINT` | Optional. The official $COPYCAT CA, once launched — only used to stamp the CA into spam metadata. |
 
 ## Running
 
@@ -135,7 +135,7 @@ launches, and how many dev wallets are pending sweep.
 
 Set **`SPAM_METADATA_URI`** to any already-pinned metadata JSON and the engine
 reuses it for every launch with no IPFS key at all — easiest is to point it at
-your official $AdCoin coin's own metadata URI, so the pairs show the real
+your official $COPYCAT coin's own metadata URI, so the pairs show the real
 logo. (Alternatively set `PINATA_JWT` and it pins the logo itself.)
 
 **`DRY_RUN=true` is the default.** The bot logs exactly what it would claim,
@@ -215,7 +215,7 @@ src/wallet.ts    keypair loading (base58 or JSON array)
 
 ## Notes
 
-- The official $AdCoin coin's creator fees (claimed wallet-wide by the
+- The official $COPYCAT coin's creator fees (claimed wallet-wide by the
   treasury) are what drive the flywheel. Spam pairs are launched by separate
   fresh wallets, so their own (usually negligible) fees don't auto-claim — run
   `npm run sweep` to pull them back in along with leftover launch SOL.

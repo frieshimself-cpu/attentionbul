@@ -1,6 +1,6 @@
 /* ============================================================
-   $AdCoin — the coin that is one giant advertisement.
-   loud neon spam chaos, blinking banner ads, SPONSORED everything.
+   $COPYCAT — a cat is stuck in the copier and it will not stop
+   printing itself. loud neon spam chaos + broken-photocopier CMYK.
    ============================================================ */
 
 :root { --cyan: #00AEEF; --magenta: #EC008C; --yellow: #FFF200; }
@@ -109,7 +109,7 @@ img { display: block; max-width: 100%; }
 }
 
 .coin-wrap { position: relative; width: 260px; height: 260px; margin: 8px auto 14px; }
-.coin { width: 260px; height: 260px; border-radius: 50%; animation: pulse 1.2s ease-in-out infinite; filter: drop-shadow(0 0 24px var(--magenta)); }
+.coin { width: 260px; height: 260px; border-radius: 18px; border: 5px solid #000; object-fit: cover; animation: pulse 1.2s ease-in-out infinite; box-shadow: 0 0 0 5px #fff, 0 0 26px var(--cyan); }
 .orbit {
   position: absolute; top: 50%; left: 50%; font-family: 'Bungee', sans-serif; font-size: 18px;
   color: #fff; background: #ff0000; padding: 4px 10px; border-radius: 20px; border: 3px solid #000;
@@ -149,19 +149,18 @@ img { display: block; max-width: 100%; }
 .b1 { background: #16a34a; } .b2 { background: var(--cyan); color:#000; transform: rotate(2deg); } .b3 { background: #dc2626; }
 .b4 { background: var(--magenta); transform: rotate(3deg); } .b5 { background: #ea580c; } .b6 { background: var(--yellow); color:#000; transform: rotate(-3deg); }
 
-/* ---------- ad boxes as loud SPONSORED banners ---------- */
+/* ---------- ad boxes as A4 photocopies ---------- */
 .adbox {
-  position: relative; z-index: 10; max-width: 700px; margin: 22px auto; border: 5px solid #000;
-  border-radius: 14px; box-shadow: 8px 8px 0 #000; overflow: hidden;
+  position: relative; z-index: 10; max-width: 700px; margin: 22px auto; border: 3px dashed #333;
+  border-radius: 4px; box-shadow: 8px 8px 0 rgba(0,0,0,.55); overflow: hidden; background: #fdfdfb;
 }
-/* blinking "AD" corner tags like a banner ad */
+/* registration crosshairs in the corners */
 .adbox::before, .adbox::after {
-  content: "AD"; position: absolute; z-index: 2; font-family: 'Bungee', sans-serif; font-size: 10px;
-  color: #000; background: var(--yellow); padding: 2px 5px; border: 2px solid #000; border-radius: 4px;
+  content: "＋"; position: absolute; font-size: 16px; color: #333; z-index: 2; line-height: 1;
 }
-.adbox::before { top: 5px; left: 6px; } .adbox::after { bottom: 5px; right: 6px; }
-.ad-tok { background: #fff59d; transform: rotate(-1deg); } .ad-buy { background: #b9fbc0; transform: rotate(1deg); }
-.adhead { font-family: 'Luckiest Guy', cursive; font-size: 22px; text-align: center; color: #fff; background: var(--magenta); padding: 10px; border-bottom: 4px solid #000; }
+.adbox::before { top: 3px; left: 4px; } .adbox::after { bottom: 3px; right: 4px; }
+.ad-tok { transform: rotate(-1deg); } .ad-buy { transform: rotate(1deg); }
+.adhead { font-family: 'Luckiest Guy', cursive; font-size: 22px; text-align: center; color: #fff; background: var(--magenta); padding: 10px; border-bottom: 4px solid #000; animation: tonerlow 5s linear infinite; }
 .adbody { padding: 16px 18px; }
 .tokline { font-size: 16px; font-weight: 700; margin: 8px 0; }
 .tokline.tiny { font-size: 12px; opacity: .7; }

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "$AdCoin creator-rewards bot: claim pump.fun creator fees and split 50/50 into new-pair spam and a DEX-ads fund",
+  "description": "$COPYCAT creator-rewards bot: claim pump.fun creator fees and split 50/50 into new-pair spam and a DEX-ads fund",
   "scripts": {
     "cycle": "tsx src/index.ts",
     "loop": "tsx src/index.ts --loop",

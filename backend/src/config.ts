@@ -82,7 +82,7 @@ export function livePreset(): LivePreset {
 
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
- * $AdCoin splits fees 50/50: half auto-spams new pairs, half is reserved to
+ * $COPYCAT splits fees 50/50: half auto-spams new pairs, half is reserved to
  * buy DEX ads (Dexscreener / DexView paid banners + trending boosts). The
  * `adFund` half is tracked and held in the treasury (or forwarded to
  * DEX_ADS_WALLET) — the engine never spends it on spam.
@@ -107,9 +107,9 @@ export const config = {
 
   spamDevBuySol: envNum('SPAM_DEV_BUY_SOL', 0),
   spamMaxLaunchesPerCycle: envNum('SPAM_MAX_LAUNCHES_PER_CYCLE', 3),
-  spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.svg'),
-  spamTokenName: envStr('SPAM_TOKEN_NAME', '$AdCoin'),
-  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'ADCOIN'),
+  spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.webp'),
+  spamTokenName: envStr('SPAM_TOKEN_NAME', '$COPYCAT'),
+  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'COPYCAT'),
   // Optional: forward the 50% ad-fund half of each claim to this wallet (the one
   // you buy DEX ads from). Unset = the ad half just accrues in the treasury and
   // you withdraw it manually to buy ads.
@@ -121,7 +121,7 @@ export const config = {
   // If set, reuse this already-pinned metadata URI for every launch instead of
   // pinning fresh via Pinata. Lets the engine run with no Pinata key at all.
   spamMetadataUri: process.env.SPAM_METADATA_URI ?? '',
-  officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://adcoin.fun'),
+  officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://copycat.fun'),
   officialTwitter: process.env.OFFICIAL_TWITTER ?? '',
   officialTelegram: process.env.OFFICIAL_TELEGRAM ?? '',
 
