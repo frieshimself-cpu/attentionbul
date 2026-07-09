@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>$SPAM — Engine Control</title>
+<title>$AdCoin — Engine Control</title>
 <style>
   :root{--bg:#14100c;--card:#1f1913;--line:#3a2f24;--cream:#FFF3E2;--red:#E5484D;--green:#3fb950;--yellow:#FFC93C;--muted:#a99a86;}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -51,7 +51,7 @@
 </style>
 </head>
 <body>
-  <h1><span>$SPAM</span> · Engine Control</h1>
+  <h1><span>$AdCoin</span> · Engine Control</h1>
   <div class="sub" id="treasury">—</div>
   <div class="banner" id="banner">connecting…</div>
 
@@ -132,7 +132,8 @@ function render(s){
 
   $('stats').innerHTML = [
     ['Balance', money(s.balanceSol), 'spendable '+s.spendableSol.toFixed(3)],
-    ['Spam budget', money(s.budgetSol), s.runway+' pairs queued'],
+    ['Spam budget (50%)', money(s.budgetSol), s.runway+' pairs queued'],
+    ['Ad fund (50%)', money(s.adFundSol||0), 'reserved for DEX ads'],
     ['Claimable fees', money(s.claimableSol), 'auto-claimed'],
     ['Reward rate', s.rewardSolPerHr.toFixed(3)+' SOL/hr', '~'+s.sustainablePairsPerHr+' pairs/hr'],
     ['Launched', String(s.launchedLifetime), s.devWalletsUnswept+' unswept'],

@@ -1,64 +1,171 @@
-// ===== $SPAM — maximum spam =====
+// ===== $AdCoin — the coin that advertises itself. half spam, half ads. =====
 
-const CA = '5Vz9Jj6yF7f523wg9UKyT1imQd3wv15orecPkwyKpump';
+// No CA yet — the ad slot is reserved. Set this when it drops.
+const CA = '2VmGNcGtY5yeNsWQs1ZFDmw3FUpvvSfvDBPjCu6Ppump';
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
-// Copy CA
 const toast = document.getElementById('toast');
 let toastT;
 function showToast(msg) {
-  toast.textContent = msg;
+  toast.innerHTML = msg;
   toast.classList.add('show');
   clearTimeout(toastT);
-  toastT = setTimeout(() => toast.classList.remove('show'), 1800);
+  toastT = setTimeout(() => toast.classList.remove('show'), 2000);
 }
 async function copyCA() {
-  try { await navigator.clipboard.writeText(CA); showToast('CA COPIED!!! NOW BUY!!! 🥫'); }
-  catch { showToast('JUST BUY $SPAM 🥫'); }
+  if (!CA) { showToast('📢 SOON™ — the ad slot is reserved, CA dropping shortly 🖱️'); return; }
+  try { await navigator.clipboard.writeText(CA); showToast("📋 CA COPIED! now paste it into every group chat. that's an ad. 📢"); }
+  catch { showToast('📢 just buy $AdCoin'); }
 }
 document.getElementById('caCopy').addEventListener('click', copyCA);
 
-// Random visitor number that keeps ticking (fake)
 const vis = document.getElementById('visnum');
 let visN = 400 + Math.floor(Math.random() * 99);
 if (vis) setInterval(() => { visN += Math.floor(Math.random() * 7); vis.textContent = '#' + String(visN).padStart(6, '0'); }, 900);
 
-// Legacy center popup that respawns when you close it (spam!)
 const popup = document.getElementById('popup');
 const popupX = document.getElementById('popupX');
 function hidePopup() {
   popup.classList.add('hidden');
   setTimeout(() => { popup.classList.remove('hidden'); }, 6000 + Math.random() * 6000);
 }
-popupX.addEventListener('click', hidePopup);
-popup.querySelector('.popup-btn').addEventListener('click', (e) => { e.preventDefault(); showToast('CLAIM = BUY $SPAM 🚀'); hidePopup(); });
+popupX.addEventListener('click', () => { showToast("🚫 you closed the ad but the ad did not close you. buy $AdCoin."); hidePopup(); });
+popup.querySelector('.popup-btn').addEventListener('click', (e) => { e.preventDefault(); copyCA(); hidePopup(); });
 
 // ===================================================================
-//  SPAM POPUP SWARM — popups everywhere, and closing one spawns more
+//  AD POPUP SWARM — ads everywhere, and closing one serves more
 // ===================================================================
 const layer = document.getElementById('popuplayer');
-const MAX_POPUPS = 9;               // cap so the browser survives
-const caBlock = `<span class="spop-ca" data-ca>${CA} 📋</span>`;
+const MAX_POPUPS = 9;
+const caBlock = CA
+  ? '<span class="spop-ca" data-ca>' + CA + ' 📋</span>'
+  : '<span class="spop-ca">CONTRACT: AD SLOT RESERVED — DROPPING SOON 📢</span>';
 
-// each template: variant class, head, body html, button text
 const TEMPLATES = [
-  { v: 'v1', head: '🎉 YOU WON!!! 🎉', body: 'You are visitor <b>#' + (100000 + Math.floor(rand(0,899999))) + '</b>!<br>You just won <b>1,000,000 $SPAM</b> 🥫', btn: 'CLAIM NOW!!!' },
-  { v: 'v2', head: '🚨 VIRUS DETECTED 🚨', body: 'Your wallet is <b>NOT holding $SPAM</b>.<br>This is a critical condition. The only known cure:', btn: '🧯 BUY $SPAM TO FIX', ca: true, jitter: true },
-  { v: 'v3', head: '💌 1 NEW MESSAGE', body: '<b>ser…</b><br>"have you bought $SPAM yet?? 👀 everyone is aping rn"', btn: 'REPLY: YES 🚀' },
-  { v: 'v4', head: '🪂 AIRDROP UNLOCKED', body: 'Paste the CA to claim your <b>FREE $SPAM</b> airdrop 🎁', btn: '💰 CLAIM AIRDROP', ca: true },
-  { v: 'v5', head: '🐋 WHALE ALERT', body: 'Someone just <b>100x\'d</b> on $SPAM.<br>Don\'t be the exit liquidity.', btn: '🦍 APE NOW' },
-  { v: 'v6', head: '⏰ PRESALE ENDING', body: 'Only <b>0.0000001%</b> of $SPAM left at this price (fake). HURRY!!!', btn: '🔥 BUY BEFORE IT\'S GONE', countdown: true },
-  { v: 'v1', head: '🎰 SPIN TO WIN', body: 'Everybody wins!!! (the prize is $SPAM)', btn: '🎡 SPIN & BUY', wheel: true },
-  { v: 'v3', head: '🤖 CAPTCHA', body: 'Prove you\'re not poor to continue.<br>Check the box:', btn: '✅ I AM BUYING $SPAM' },
-  { v: 'v2', head: '📉 PORTFOLIO ALERT', body: 'Your portfolio is down bad because it has <b>0 $SPAM</b>.<br>Analysts recommend: buy $SPAM.', btn: '📈 FIX MY BAGS' },
-  { v: 'v4', head: '👀 3 DEGENS NEARBY', body: 'Hot degens in your area are aping <b>$SPAM</b> right now 🥵', btn: '🔗 CONNECT WALLET' },
-  { v: 'v5', head: '📢 CA DROP', body: 'This is the <b>official $SPAM CA</b>. Copy it. Buy it. Spam it.', btn: '🥫 I COPIED IT', ca: true },
-  { v: 'v6', head: '💸 FREE MONEY', body: 'Click below to receive <b>nothing</b> — but you\'ll probably buy $SPAM anyway.', btn: '🤑 GIMME' },
+  {
+    "head": "🎉 YOU'RE THE 1,000,000th VISITOR!",
+    "body": "Our ad targeting selected <b>YOU</b>.<br>Claim your <b>1,000,000 $AdCoin</b> in free ad-credits now.",
+    "btn": "CLAIM MY ADS 📢",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v1"
+  },
+  {
+    "head": "🚨 YOUR CHART HAS NO ADS",
+    "body": "Your portfolio is running <b>UNsponsored</b>.<br>This is embarrassing. Fix it immediately.",
+    "btn": "SPONSOR ME 📢",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": true,
+    "v": "v2"
+  },
+  {
+    "head": "🍪 THIS SITE USES 999 COOKIES",
+    "body": "By staying you agree to be advertised at, forever, by <b>$AdCoin</b>.",
+    "btn": "ACCEPT ALL &amp; BUY",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v3"
+  },
+  {
+    "head": "📩 1 NEW AD IN YOUR INBOX",
+    "body": "<b>ser…</b><br>'your wallet qualifies for <b>premium ad placement</b> 👀 act now'",
+    "btn": "OPEN AD",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v4"
+  },
+  {
+    "head": "🪂 FREE AD CREDITS",
+    "body": "Paste the CA to claim <b>999,999 $AdCoin ad impressions</b>:<br>Offer expires never (it's an ad).",
+    "btn": "CLAIM CREDITS",
+    "ca": true,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v5"
+  },
+  {
+    "head": "🐋 WHALE ALERT — SOMEONE BOUGHT AD SPACE",
+    "body": "<b>0xBanner</b> just bought <b>42 SOL</b> of $AdCoin ad space.<br>Don't let him own the whole billboard.",
+    "btn": "OUTBID THE WHALE",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v6"
+  },
+  {
+    "head": "⏳ YOUR AD SLOT EXPIRES SOON",
+    "body": "This premium trending slot resets in:<br>Do NOT lose your placement.",
+    "btn": "LOCK MY SLOT",
+    "ca": false,
+    "wheel": false,
+    "countdown": true,
+    "jitter": false,
+    "v": "v1"
+  },
+  {
+    "head": "🎡 SPIN THE AD-ROULETTE!",
+    "body": "Land on <b>TRENDING #1</b> to boost your bags!<br>Everyone's a winner (you're the product).",
+    "btn": "SPIN TO ADVERTISE",
+    "ca": false,
+    "wheel": true,
+    "countdown": false,
+    "jitter": false,
+    "v": "v2"
+  },
+  {
+    "head": "🤖 ARE YOU AN AD-BLOCKER?",
+    "body": "Prove you love ads.<br>Select all charts with <b>a $AdCoin banner</b>.",
+    "btn": "I ❤️ ADS",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": true,
+    "v": "v3"
+  },
+  {
+    "head": "📉 YOUR COIN ISN'T TRENDING",
+    "body": "You are down bad <b>AND</b> off the trending list.<br>Only $AdCoin fixes both.",
+    "btn": "BUY TRENDING (APE)",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v4"
+  },
+  {
+    "head": "👀 3.7 BILLION IMPRESSIONS SERVED",
+    "body": "$AdCoin is on every chart, every group, every timeline.<br>Join the ad network or get <b>advertised AT</b>.",
+    "btn": "JOIN THE NETWORK",
+    "ca": false,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v5"
+  },
+  {
+    "head": "📢 OFFICIAL CA — SKIP THIS AD in 5…4…",
+    "body": "This is the ONE real $AdCoin. Every other listing is unsponsored spam.<br>Copy responsibly:",
+    "btn": "COPY THE CA 📋",
+    "ca": true,
+    "wheel": false,
+    "countdown": false,
+    "jitter": false,
+    "v": "v6"
+  }
 ];
 
 function place(el) {
-  // random spot, kept off the very edges + away from the fixed marquees
   const w = el.offsetWidth || 300, h = el.offsetHeight || 200;
   const maxL = Math.max(50, window.innerWidth - w - 50);
   const maxT = Math.max(52, window.innerHeight - h - 60);
@@ -80,22 +187,20 @@ function spawnPopup(t) {
     '<div class="spop-body">' + t.body + '</div>' +
     (t.ca ? caBlock : '') +
     '<span class="spop-btn">' + t.btn + '</span>' +
-    '<div class="spop-tiny">(not real. not financial advice. just buy $SPAM.)</div>';
+    '<div class="spop-tiny">(not real. not financial advice. it is a paid advertisement. do not click.)</div>';
   layer.appendChild(el);
   place(el);
 
-  // countdown ticker
   const cd = el.querySelector('[data-cd]');
   if (cd) {
     let s = parseInt(cd.textContent.split(':').pop(), 10) || 5;
     const iv = setInterval(() => {
-      s = s <= 0 ? Math.ceil(rand(3, 9)) : s - 1; // never actually ends
+      s = s <= 0 ? Math.ceil(rand(3, 9)) : s - 1;
       cd.textContent = '00:00:0' + Math.min(9, s);
     }, 1000);
     el._iv = iv;
   }
 
-  // closing spawns 1–2 MORE (spam multiplies), plus a respawn later
   const kill = (multiply) => {
     if (el._iv) clearInterval(el._iv);
     el.remove();
@@ -104,35 +209,27 @@ function spawnPopup(t) {
       for (let i = 0; i < n; i++) setTimeout(spawnPopup, rand(120, 500));
     }
   };
-  el.querySelector('.spop-x').addEventListener('click', () => { showToast('YOU CAN\'T ESCAPE $SPAM 🥫'); kill(true); });
+  el.querySelector('.spop-x').addEventListener('click', () => { showToast("🚫 you closed the ad but the ad did not close you. buy $AdCoin."); kill(true); });
   el.querySelector('.spop-btn').addEventListener('click', () => { copyCA(); kill(false); setTimeout(spawnPopup, rand(300, 900)); });
   const caEl = el.querySelector('[data-ca]');
   if (caEl) caEl.addEventListener('click', copyCA);
 }
 
-// seed a few immediately, then keep the swarm topped up forever
 for (let i = 0; i < 3; i++) setTimeout(spawnPopup, 600 + i * 700);
 setInterval(() => { if (layer.children.length < MAX_POPUPS) spawnPopup(); }, 1900);
 
 // ===================================================================
-//  CORNER "just bought" notifications
+//  CORNER "just bought ad space" notifications
 // ===================================================================
 const notifLayer = document.getElementById('notiflayer');
-const NAMES = ['0xW3n', 'degenmike', 'ansem_fan', 'trench_gary', 'soon.sol', 'exit_liquidity', 'pumpchad', 'jeetslayer', 'gm_gn', 'bagholder99', 'wifhat', 'liquidated_larry', 'spamlord', 'notafinancialadvisor'];
-const NOTES = [
-  (n, a) => `🐋 <b>${n}</b> just bought <b>${a} SOL</b> of $SPAM`,
-  (n, a) => `🚀 <b>${n}</b> aped <b>${a} SOL</b> — up only`,
-  (n, a) => `🔥 <b>${n}</b> just market-bought <b>${a} SOL</b>`,
-  (n) => `💎 <b>${n}</b> set $SPAM as their entire personality`,
-  (n, a) => `📈 <b>${n}</b> added <b>${a} SOL</b> to the bag`,
-  (n) => `🥫 <b>${n}</b> is spamming the trenches with $SPAM`,
-];
+const NAMES = ["0xBanner", "cpm_chad", "trending_tina", "popup_pete", "sponsored_sam", "dexscreener_dan", "impression_ian", "clickbait_carl", "adsense_amy", "billboard_bob", "skip_ad_steve", "native_ad_nina", "retarget_rick", "pixel_pat", "sponsored.sol", "adblock_andy"];
+const NOTE_TEMPLATES = ["📢 <b>{n}</b> just bought <b>{a} SOL</b> of ad space", "📈 <b>{n}</b> boosted $AdCoin to trending with <b>{a} SOL</b>", "🖱️ <b>{n}</b> clicked the ad and aped <b>{a} SOL</b>", "💸 <b>{n}</b> bought a <b>{a} SOL</b> Dexscreener banner", "🚀 <b>{n}</b> paid <b>{a} SOL</b> to skip the ad (bought instead)", "📺 <b>{n}</b> just went full-screen with <b>{a} SOL</b>", "🔁 <b>{n}</b> retargeted <b>{a} SOL</b> back into $AdCoin", "⭐ <b>{n}</b> sponsored the trenches (+{a} SOL)"];
 function popNotif() {
   if (notifLayer.children.length > 4) return;
   const el = document.createElement('div');
   el.className = 'notif';
   const name = pick(NAMES), amt = (rand(0.3, 42)).toFixed(1);
-  el.innerHTML = pick(NOTES)(name, amt);
+  el.innerHTML = pick(NOTE_TEMPLATES).replaceAll('{n}', name).replaceAll('{a}', amt);
   notifLayer.appendChild(el);
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 4200);
 }
@@ -140,23 +237,18 @@ setInterval(popNotif, 2600);
 setTimeout(popNotif, 1500);
 
 // ===================================================================
-//  Scattered stickers (unchanged)
+//  Scattered ad stickers
 // ===================================================================
-const PHRASES = [
-  '🚀 1000X', 'BUY NOW!!!', 'DON\'T FADE', 'FREE $SPAM', 'APE IN 🦍', 'LP LOCKED 🔒',
-  'MOON 🌙', 'BASED DEV', 'LAST CHANCE', 'NGMI IF U MISS', 'SPAM IT 🥫', '100% SAFU',
-  'CLICK HERE 👉', 'HODL 💎', 'PUMP IT 🔥', 'WAGMI', 'DEGEN SZN', 'SEND IT 🚀',
-];
-const COLORS = ['#ff2e63', '#7c3aed', '#059669', '#2563eb', '#d97706', '#db2777', '#0891b2', '#ca8a04'];
+const PHRASES = ["YOUR AD HERE", "SPONSORED 📢", "CLICK HERE 👆", "AS SEEN ON EVERY CHART", "50% SPAM 50% ADS", "TRENDING #1", "SKIP AD ▶", "BUY = IMPRESSIONS", "NOW ON DEXSCREENER", "AD-FUNDED PUMP", "1000X CPM", "NO AD-BLOCK 🚫", "POP-UP APPROVED", "BANNER SZN", "LIMITED AD SLOTS", "GET ADVERTISED AT", "DOUBLE YOUR REACH", "SPONSORED BY YOU", "ADS = LIQUIDITY", "MORE ADS 📢"];
 const stickerLayer = document.getElementById('stickers');
-for (let i = 0; i < 26; i++) {
+const STCLS = ['st-a','st-b','st-c','st-d','st-e'];
+for (let i = 0; i < 24; i++) {
   const s = document.createElement('div');
-  s.className = 'sticker';
+  s.className = 'sticker ' + pick(STCLS);
   s.textContent = pick(PHRASES);
   const rot = rand(-14, 14);
   s.style.top = rand(6, 92) + '%';
   s.style.left = rand(2, 90) + '%';
-  s.style.background = pick(COLORS);
   s.style.setProperty('--r', rot + 'deg');
   s.style.transform = 'rotate(' + rot + 'deg)';
   s.style.animationDelay = rand(0, 2) + 's';
@@ -164,8 +256,8 @@ for (let i = 0; i < 26; i++) {
   stickerLayer.appendChild(s);
 }
 
-// Emoji confetti rain
-const EMOJI = ['🥫', '🚀', '🔥', '💰', '🌙', '💎', '🦍', '📈', '🤑', '💸'];
+// Confetti: ads raining down
+const EMOJI = ["📢", "📣", "📈", "💸", "🖱️", "⭐", "🔥", "💰", "📺", "🪧", "✨"];
 function drop() {
   const e = document.createElement('div');
   e.textContent = pick(EMOJI);
@@ -176,7 +268,6 @@ function drop() {
 }
 setInterval(drop, 450);
 
-// Title screams into the tab
 const base = document.title;
 let flip = false;
-setInterval(() => { document.title = (flip = !flip) ? '🚨 BUY $SPAM NOW 🚨' : base; }, 900);
+setInterval(() => { document.title = (flip = !flip) ? "📢 (1) NEW AD — BUY $AdCoin NOW 🖱️" : base; }, 900);

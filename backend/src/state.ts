@@ -44,7 +44,7 @@ const stateDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '
 const statePath = path.join(stateDir, 'state.json');
 
 const EMPTY: BotState = {
-  buckets: { spam: '0' },
+  buckets: { spam: '0', adFund: '0' },
   totalClaimedLamports: '0',
   spamLaunchCount: 0,
   lastCycleAt: null,
@@ -52,7 +52,10 @@ const EMPTY: BotState = {
 
 export function loadState(): BotState {
   try {
-    return { ...EMPTY, ...JSON.parse(fs.readFileSync(statePath, 'utf8')) };
+    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    // Merge buckets so a state file written before a new bucket existed (e.g. an
+    // old spam-only file) still gets every current bucket seeded to '0'.
+    return { ...EMPTY, ...parsed, buckets: { ...EMPTY.buckets, ...(parsed.buckets ?? {}) } };
   } catch {
     return structuredClone(EMPTY);
   }
@@ -66,12 +69,12 @@ export function saveState(state: BotState): void {
 }
 
 export function getBucket(state: BotState, bucket: Bucket): bigint {
-  return BigInt(state.buckets[bucket]);
+  return BigInt(state.buckets[bucket] ?? '0');
 }
 
-export function creditBuckets(state: BotState, amounts: Record<Bucket, bigint>): void {
+export function creditBuckets(state: BotState, amounts: Partial<Record<Bucket, bigint>>): void {
   for (const [bucket, amount] of Object.entries(amounts) as [Bucket, bigint][]) {
-    state.buckets[bucket] = (BigInt(state.buckets[bucket]) + amount).toString();
+    state.buckets[bucket] = (BigInt(state.buckets[bucket] ?? '0') + amount).toString();
   }
 }
 

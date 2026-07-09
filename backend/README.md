@@ -1,15 +1,17 @@
-# $SPAM rewards bot
+# $AdCoin rewards bot
 
-Self-hosted bot that turns pump.fun creator rewards into more pairs, on a loop:
+Self-hosted bot that turns pump.fun creator rewards into spam + ads, on a loop:
 
 ```
 claim creator rewards (bonding curve + PumpSwap vaults)
         │
         ▼
- 100% into the spam budget (persistent)
+ split 50 / 50 into persistent buckets
         │
-        └─ Pair Spam Engine → launches new $SPAM pairs on pump.fun, non-stop,
-                              each from a fresh throwaway dev wallet
+        ├─ 50%  Pair Spam Engine → launches new $AdCoin pairs on pump.fun,
+        │                          non-stop, each from a fresh throwaway wallet
+        └─ 50%  Ad Fund          → reserved (or forwarded to DEX_ADS_WALLET) to
+                                   buy DEX ads: Dexscreener/DexView banners + trending
 ```
 
 Keys never leave the box: claims are built with the official `@pump-fun/pump-sdk`
@@ -34,11 +36,11 @@ You need:
 
 | Thing | Where |
 | --- | --- |
-| `CREATOR_WALLET_SECRET` | The wallet that launched $SPAM (it accrues the creator rewards). Phantom base58 export or solana-keygen JSON array. |
+| `CREATOR_WALLET_SECRET` | The wallet that launched $AdCoin (it accrues the creator rewards). Phantom base58 export or solana-keygen JSON array. |
 | `RPC_URL` | Free Helius endpoint recommended (public RPC drops transactions under load). |
 | `SPAM_METADATA_URI` | Easiest metadata path — reuse an already-pinned metadata JSON (no key needed). Or set `PINATA_JWT` instead. |
 | `PINATA_JWT` | Optional. Free at pinata.cloud — pins token metadata to IPFS if you're not using `SPAM_METADATA_URI` (pump.fun closed their own upload endpoint). |
-| `COIN_MINT` | Optional. The official $SPAM CA, once launched — only used to stamp the CA into spam metadata. |
+| `COIN_MINT` | Optional. The official $AdCoin CA, once launched — only used to stamp the CA into spam metadata. |
 
 ## Running
 
@@ -83,7 +85,7 @@ spam fast when fees pour in, slow when they don't, pause when they stop.
 How the timing works:
 
 1. **Claim → fill budget.** Each claim adds `SPAM_REWARD_FRACTION` of the fees
-   (default 100%) to the spam budget. Re-claims every `SPAM_CLAIM_EVERY_SEC`.
+   (50% — the other half funds the ad fund) to the spam budget. Re-claims every `SPAM_CLAIM_EVERY_SEC`.
 2. **Burst from the budget.** Launches `SPAM_BURST_SIZE` (3) pairs at a time,
    each from a fresh dev wallet, debiting the budget per launch.
 3. **Throttle by budget depth** — which reflects how fast you're earning. Full
@@ -133,7 +135,7 @@ launches, and how many dev wallets are pending sweep.
 
 Set **`SPAM_METADATA_URI`** to any already-pinned metadata JSON and the engine
 reuses it for every launch with no IPFS key at all — easiest is to point it at
-your official $SPAM coin's own metadata URI, so the pairs show the real
+your official $AdCoin coin's own metadata URI, so the pairs show the real
 logo. (Alternatively set `PINATA_JWT` and it pins the logo itself.)
 
 **`DRY_RUN=true` is the default.** The bot logs exactly what it would claim,
@@ -198,7 +200,7 @@ pm2 start "npm run loop" --name spam-bot --cwd backend
 src/index.ts     orchestrator, spam engine dispatch, management view, test cmds
 src/engine.ts    throttled spam engine (burst + auto-slowdown loop)
 src/claim.ts     creator-fee claim via @pump-fun/pump-sdk (+ WSOL unwrap)
-src/split.ts     integer 100%-to-spam allocation math (tested)
+src/split.ts     integer 50/50 spam-/ad-fund allocation math (tested)
 src/spam.ts      pair launches from fresh per-pair dev wallets
 src/keystore.ts  persists the dev wallets (state/dev-wallets.json)
 src/sweep.ts     drains used dev wallets back to the treasury
@@ -213,7 +215,7 @@ src/wallet.ts    keypair loading (base58 or JSON array)
 
 ## Notes
 
-- The official $SPAM coin's creator fees (claimed wallet-wide by the
+- The official $AdCoin coin's creator fees (claimed wallet-wide by the
   treasury) are what drive the flywheel. Spam pairs are launched by separate
   fresh wallets, so their own (usually negligible) fees don't auto-claim — run
   `npm run sweep` to pull them back in along with leftover launch SOL.

@@ -3,6 +3,7 @@ import { config, lamportsToSol } from './config.js';
 import { connection } from './rpc.js';
 import { claimRewards } from './claim.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
+import { splitLamports } from './split.js';
 import { getControl, updateControl, ControlState } from './control.js';
 import {
   BotState,
@@ -59,15 +60,21 @@ async function interruptibleSleep(totalSec: number): Promise<void> {
   }
 }
 
-/** Claim fees (only past the worth-claiming floor) and add the configured fraction to the spam budget. */
+/**
+ * Claim fees (only past the worth-claiming floor) and split them per
+ * ALLOCATION_BPS: half funds the spam budget, half accrues to the ad fund
+ * (reserved for buying DEX ads). The engine only ever spends the spam bucket.
+ */
 async function claimIntoBudget(treasury: Keypair, state: BotState): Promise<bigint> {
   const claimed = await claimRewards(treasury); // returns 0 unless >= MIN_CLAIM_SOL
   if (claimed > 0n) {
-    creditBuckets(state, { spam: claimed }); // 100% funds trench spam
+    const split = splitLamports(claimed); // { spam, adFund } — 50/50
+    creditBuckets(state, split);
     state.totalClaimedLamports = (BigInt(state.totalClaimedLamports) + claimed).toString();
     recordClaim(state, claimed, Date.now());
     if (!config.dryRun) saveState(state);
-    log(`engine: claimed ${lamportsToSol(claimed).toFixed(4)} SOL -> spam budget`);
+    log(`engine: claimed ${lamportsToSol(claimed).toFixed(4)} SOL -> ` +
+      `${lamportsToSol(split.spam).toFixed(4)} spam / ${lamportsToSol(split.adFund).toFixed(4)} ad fund`);
   }
   return claimed;
 }
@@ -126,13 +133,15 @@ export async function runSpamEngine(
 
       const spendable = await spendableLamports(treasury);
 
-      // Spend-principal mode: keep the budget topped up to the wallet's spendable
-      // balance so the engine bursts off principal + rewards, not just rewards.
-      // Only ever raises the budget UP TO spendable — actual spending stays
+      // Spend-principal mode: top the spam budget up to the wallet's spendable
+      // balance MINUS the reserved ad fund, so fast spamming never eats the 50%
+      // earmarked for DEX ads. Only ever raises the budget; actual spending stays
       // capped by the `affordable` guard below, and RESERVE_SOL is always kept.
       if (config.spamSpendPrincipal && !config.dryRun) {
+        const adReserved = getBucket(state, 'adFund');
+        const spamCap = spendable > adReserved ? spendable - adReserved : 0n;
         const budgetNow = getBucket(state, 'spam');
-        if (spendable > budgetNow) { creditBuckets(state, { spam: spendable - budgetNow }); saveState(state); }
+        if (spamCap > budgetNow) { creditBuckets(state, { spam: spamCap - budgetNow }); saveState(state); }
       }
 
       const runway = budgetRunway(state);

@@ -9,10 +9,13 @@ assert.equal(
   'allocation must sum to 100%'
 );
 
-// 100% to the single spam bucket, nothing lost
+// 50/50 spam / ad-fund split, nothing lost, remainder to spam
 for (const total of [0n, 1n, 3n, 999n, 1_000_000_000n, 123_456_789_123n]) {
   const a = splitLamports(total);
-  assert.equal(a.spam, total, `all funds to spam for ${total}`);
+  assert.equal(a.spam + a.adFund, total, `no lamports lost for ${total}`);
+  assert.equal(a.adFund, total / 2n, `ad fund is floor(half) for ${total}`);
+  assert.equal(a.spam, total - total / 2n, `spam gets its half + remainder for ${total}`);
+  assert.ok(a.spam >= a.adFund, `spam >= adFund (remainder to spam) for ${total}`);
 }
 
 // splitEqually still preserves totals (used for future N-way distributions)

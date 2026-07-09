@@ -24,11 +24,11 @@ async function spendable(creator: Keypair): Promise<bigint> {
 async function runCycle(creator: Keypair, state: BotState): Promise<void> {
   log(`===== cycle start${config.dryRun ? ' (DRY RUN — nothing will be sent)' : ''} =====`);
 
-  // 1. Claim creator rewards — 100% funds trench spam.
+  // 1. Claim creator rewards — split 50/50: spam new pairs / reserve for DEX ads.
   const claimed = await claimRewards(creator);
   if (claimed >= config.minCycleLamports) {
     const split = splitLamports(claimed);
-    log(`split: +${lamportsToSol(split.spam).toFixed(4)} to spam budget (100%)`);
+    log(`split: +${lamportsToSol(split.spam).toFixed(4)} spam budget / +${lamportsToSol(split.adFund).toFixed(4)} ad fund`);
     if (!config.dryRun) {
       creditBuckets(state, split);
       state.totalClaimedLamports = (BigInt(state.totalClaimedLamports) + claimed).toString();
@@ -74,6 +74,7 @@ async function runCycle(creator: Keypair, state: BotState): Promise<void> {
 function printStatus(state: BotState): void {
   log(
     `spam budget: ${lamportsToSol(getBucket(state, 'spam')).toFixed(4)} SOL | ` +
+      `ad fund: ${lamportsToSol(getBucket(state, 'adFund')).toFixed(4)} SOL | ` +
       `lifetime: claimed ${lamportsToSol(BigInt(state.totalClaimedLamports)).toFixed(4)} SOL, ` +
       `${state.spamLaunchCount} launches, last cycle ${state.lastCycleAt ?? 'never'}`
   );
@@ -87,6 +88,7 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   ]);
   const spendable = balance > config.reserveLamports ? balance - config.reserveLamports : 0n;
   const budget = getBucket(state, 'spam');
+  const adFund = getBucket(state, 'adFund');
   const runway = Number(budget / launchCostLamports());
   const lp = getControl();
   const interval = throttleIntervalSec(runway);
@@ -96,16 +98,17 @@ async function printManagementView(treasury: Keypair, state: BotState): Promise<
   const wallets = loadDevWallets();
   const unswept = wallets.filter((w) => w.status !== 'swept').length;
 
-  log('=============== $SPAM — trench spam engine ===============');
+  log('=============== $AdCoin — 50% spam / 50% DEX ads ===============');
   log(`treasury:      ${treasury.publicKey.toBase58()}`);
   log(`balance:       ${lamportsToSol(balance).toFixed(4)} SOL  (spendable ${lamportsToSol(spendable).toFixed(4)}, reserve ${lamportsToSol(config.reserveLamports).toFixed(4)})`);
   log(`claimable:     ${lamportsToSol(claimable).toFixed(6)} SOL in unclaimed creator fees`);
-  log(`spam budget:   ${lamportsToSol(budget).toFixed(4)} SOL = ${runway} pairs queued (funded by ${Math.round(config.spamRewardFraction * 100)}% of rewards)`);
+  log(`spam budget:   ${lamportsToSol(budget).toFixed(4)} SOL = ${runway} pairs queued (50% of rewards fund new pairs)`);
+  log(`ad fund:       ${lamportsToSol(adFund).toFixed(4)} SOL reserved for DEX ads${config.dexAdsWallet ? ` (-> ${config.dexAdsWallet})` : ' (withdraw to buy ads)'}`);
   log(`reward rate:   ${lamportsToSol(ratePerHour).toFixed(4)} SOL/hr in fees  ->  ~${pairsPerHour} pairs/hr sustainable`);
   log(`engine:        ${lp.running ? 'RUNNING' : 'PAUSED'}  (peak burst ${lp.burst} every ${lp.intervalSec}s)`);
   log(`cadence now:   burst ${lp.burst} every ${interval}s (min ${lp.intervalSec}s / max ${lp.maxIntervalSec}s)`);
   log(`launched:      ${state.spamLaunchCount} lifetime | dev wallets ${wallets.length} (${unswept} unswept — 'npm run sweep')`);
-  log('======================================================');
+  log('================================================================');
 }
 
 /** Write SPAM_PRESET into .env so a switch survives restarts. */
@@ -144,7 +147,7 @@ async function main(): Promise<void> {
   // Offline status (no wallet needed): state file only.
   if (args.includes('--status') && !config.creatorWalletSecret) {
     printStatus(state);
-    log('allocation: 100% creator rewards → trench spam ($SPAM)');
+    log('allocation: 50% creator rewards → spam new pairs | 50% → DEX ads ($AdCoin)');
     return;
   }
 

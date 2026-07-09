@@ -82,10 +82,14 @@ export function livePreset(): LivePreset {
 
 /**
  * Creator-rewards allocation in basis points. Must sum to 10_000.
- * 100% pair spam — flood the trenches with new $SPAM pairs, non-stop.
+ * $AdCoin splits fees 50/50: half auto-spams new pairs, half is reserved to
+ * buy DEX ads (Dexscreener / DexView paid banners + trending boosts). The
+ * `adFund` half is tracked and held in the treasury (or forwarded to
+ * DEX_ADS_WALLET) — the engine never spends it on spam.
  */
 export const ALLOCATION_BPS = {
-  spam: 10_000,
+  spam: 5_000,
+  adFund: 5_000,
 } as const;
 
 export type Bucket = keyof typeof ALLOCATION_BPS;
@@ -103,9 +107,13 @@ export const config = {
 
   spamDevBuySol: envNum('SPAM_DEV_BUY_SOL', 0),
   spamMaxLaunchesPerCycle: envNum('SPAM_MAX_LAUNCHES_PER_CYCLE', 3),
-  spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.jpg'),
-  spamTokenName: envStr('SPAM_TOKEN_NAME', '$SPAM'),
-  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'SPAM'),
+  spamImagePath: envStr('SPAM_IMAGE_PATH', '../assets/logo.svg'),
+  spamTokenName: envStr('SPAM_TOKEN_NAME', '$AdCoin'),
+  spamTokenSymbol: envStr('SPAM_TOKEN_SYMBOL', 'ADCOIN'),
+  // Optional: forward the 50% ad-fund half of each claim to this wallet (the one
+  // you buy DEX ads from). Unset = the ad half just accrues in the treasury and
+  // you withdraw it manually to buy ads.
+  dexAdsWallet: process.env.DEX_ADS_WALLET ?? '',
   // Vary the pair name slightly per launch? Off = every trench pair is an
   // identical clone of the runner (the point: flood with THIS coin).
   spamVaryName: envBool('SPAM_VARY_NAME', false),
@@ -113,7 +121,7 @@ export const config = {
   // If set, reuse this already-pinned metadata URI for every launch instead of
   // pinning fresh via Pinata. Lets the engine run with no Pinata key at all.
   spamMetadataUri: process.env.SPAM_METADATA_URI ?? '',
-  officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://spam.fun'),
+  officialWebsite: envStr('OFFICIAL_WEBSITE', 'https://adcoin.fun'),
   officialTwitter: process.env.OFFICIAL_TWITTER ?? '',
   officialTelegram: process.env.OFFICIAL_TELEGRAM ?? '',
 
@@ -132,10 +140,11 @@ export const config = {
   // amount clears this floor — so claiming every 5s never burns fees on dust
   // (a claim can create a ~0.002 SOL WSOL account, so sub-floor claims lose money).
   minClaimLamports: solToLamports(envNum('MIN_CLAIM_SOL', 0.005)),
-  // Fraction of each claim that funds spam (1.0 = all of it; 0.5 keeps half for
-  // bagworkers). The spam engine only ever spends this reward budget — never
-  // principal — so the launch rate tracks the fee-earning rate.
-  spamRewardFraction: envNum('SPAM_REWARD_FRACTION', 1.0),
+  // Fraction of each claim that funds spam — derived from the allocation so it
+  // can never drift from ALLOCATION_BPS (0.5 = half funds spam, half → ad fund).
+  // The engine only ever spends this reward budget, never principal, so the
+  // launch rate tracks the fee-earning rate.
+  spamRewardFraction: ALLOCATION_BPS.spam / 10_000,
   // Optional one-time bootstrap: seed the spam budget from principal so the
   // engine can start launching before fees have accrued. 0 = pure rewards-funded.
   spamSeedLamports: solToLamports(envNum('SPAM_SEED_SOL', 0)),
@@ -154,4 +163,5 @@ export function validateLiveConfig(): void {
   if (total !== 10_000) throw new Error(`ALLOCATION_BPS must sum to 10000, got ${total}`);
   if (!config.creatorWalletSecret) throw new Error('CREATOR_WALLET_SECRET is required');
   if (config.coinMint) new PublicKey(config.coinMint); // throws if malformed
+  if (config.dexAdsWallet) new PublicKey(config.dexAdsWallet); // throws if malformed
 }
