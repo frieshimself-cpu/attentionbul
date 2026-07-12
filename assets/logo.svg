@@ -1,29 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="$COPYCAT">
-  <rect width="512" height="512" rx="72" fill="#00AEEF"/>
-  <!-- copier slot -->
-  <rect x="70" y="300" width="372" height="150" rx="16" fill="#e9edf0" stroke="#000" stroke-width="10"/>
-  <rect x="70" y="300" width="372" height="26" fill="#000" opacity="0.75"/>
-  <!-- cat peeking out -->
-  <g stroke="#000" stroke-width="10" stroke-linejoin="round">
-    <!-- ears -->
-    <path d="M150 150 L188 236 L112 236 Z" fill="#8a6a4a"/>
-    <path d="M362 150 L400 236 L324 236 Z" fill="#fff"/>
-    <!-- head -->
-    <path d="M120 250 Q120 130 256 130 Q392 130 392 250 Q392 322 256 322 Q120 322 120 250 Z" fill="#fff"/>
-    <path d="M120 250 Q120 130 256 130 L256 322 Q120 322 120 250 Z" fill="#8a6a4a"/>
+  <rect width="512" height="512" fill="#fff"/>
+  <!-- back cat (offset, the 'copy') -->
+  <g fill="#0a0a0a" opacity="0.35" transform="translate(40 -6)">
+    <path d="M300 200 l16 -44 24 44z M356 200 l16 -44 24 44z
+             M300 200 q-6 -30 40 -30 q46 0 40 30 q28 14 28 56 q0 60 -68 60 q-68 0 -68 -60 q0 -42 28 -56z
+             M300 316 q80 20 148 0 l0 44 -148 0z"/>
   </g>
-  <!-- eyes -->
-  <circle cx="205" cy="235" r="26" fill="#fff" stroke="#000" stroke-width="6"/>
-  <circle cx="307" cy="235" r="26" fill="#fff" stroke="#000" stroke-width="6"/>
-  <circle cx="205" cy="238" r="12" fill="#111"/>
-  <circle cx="307" cy="238" r="12" fill="#111"/>
-  <!-- nose + mouth -->
-  <path d="M242 268 L270 268 L256 282 Z" fill="#EC008C" stroke="#000" stroke-width="4"/>
-  <!-- whiskers -->
-  <g stroke="#000" stroke-width="5" stroke-linecap="round">
-    <path d="M150 262 L92 250"/><path d="M150 278 L94 286"/>
-    <path d="M362 262 L420 250"/><path d="M362 278 L418 286"/>
+  <!-- front cat (the 'original') -->
+  <g fill="#0a0a0a" transform="translate(-24 34)">
+    <path d="M180 210 l16 -46 26 46z M240 210 l16 -46 26 46z
+             M180 210 q-8 -32 44 -32 q52 0 44 32 q30 16 30 60 q0 64 -74 64 q-74 0 -74 -64 q0 -44 30 -60z
+             M176 332 q84 22 156 0 l0 48 -156 0z"/>
   </g>
-  <!-- ticker -->
-  <text x="256" y="415" text-anchor="middle" font-family="'Arial Black',Impact,sans-serif" font-weight="900" font-size="58" fill="#fff" stroke="#000" stroke-width="6" paint-order="stroke">$COPYCAT</text>
+  <!-- glitch bars -->
+  <g fill="#fff">
+    <rect x="228" y="212" width="72" height="14"/>
+    <rect x="246" y="240" width="54" height="12"/>
+    <rect x="236" y="286" width="86" height="12"/>
+  </g>
 </svg>
