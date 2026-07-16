@@ -1,0 +1,7 @@
+# Local scratch / working files (build scripts, screenshots) — never commit
+scratchpad/
+
+# Secrets & runtime state (also covered by backend/.gitignore)
+backend/.env
+backend/state/
+.env
