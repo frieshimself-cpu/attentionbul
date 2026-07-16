@@ -14,6 +14,7 @@
     "panel": "tsx src/server.ts",
     "set": "tsx src/set.ts",
     "spam": "tsx src/index.ts --spam",
+    "community": "tsx src/index.ts --community",
     "sweep": "tsx src/index.ts --sweep",
     "preset": "tsx src/index.ts --preset",
     "test": "tsx test/split.test.ts",

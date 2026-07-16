@@ -20,6 +20,7 @@ export interface BotState {
   spamImageCid?: string; // image pinned once, reused across per-pair metadata
   spamSeeded?: boolean; // one-time principal seed applied
   recentClaims?: { ts: number; lamports: string }[]; // rolling window for reward-rate
+  communityLastCount?: number; // last-seen X community member count (join-watcher baseline)
   lastCycleAt: string | null;
 }
 

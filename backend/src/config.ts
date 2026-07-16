@@ -145,6 +145,22 @@ export const config = {
   // per-burst spendable guard still caps actual spending. Lets you fund fast
   // spamming by simply topping up the dev wallet.
   spamSpendPrincipal: envBool('SPAM_SPEND_PRINCIPAL', false),
+
+  // ---- X community join-watcher ----
+  // The X (Twitter) community to watch for new members. Full URL or bare numeric
+  // id (e.g. https://x.com/i/communities/2016604775677047117). Defaults to the
+  // OFFICIAL_TWITTER link if that already points at a community.
+  communityUrl: process.env.X_COMMUNITY_URL ?? process.env.OFFICIAL_TWITTER ?? '',
+  // Pairs to spam per NEW member detected (3 = "3 pairs every time someone joins").
+  communityPairsPerJoin: envNum('COMMUNITY_PAIRS_PER_JOIN', 3),
+  // How often to poll the member count (X has no join webhook — this polls).
+  communityPollSec: envNum('COMMUNITY_POLL_SEC', 45),
+  // Safety cap: most pairs to fire for a single detected jump, so a large delta
+  // (or a bad count read) can't drain the wallet in one tick.
+  communityMaxPairsPerTick: envNum('COMMUNITY_MAX_PAIRS_PER_TICK', 30),
+  // Optional X API v2 bearer token for reliable member_count reads. Without it
+  // the watcher falls back to state/member-count.txt, then a best-effort scrape.
+  xBearerToken: process.env.X_BEARER_TOKEN ?? '',
 } as const;
 
 /**
