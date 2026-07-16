@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+
+  <defs>
+    <linearGradient id="head" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3e7d2"/>
+      <stop offset="1" stop-color="#ddc6a4"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ecdcc0"/>
+      <stop offset="1" stop-color="#d4bc98"/>
+    </linearGradient>
+    <linearGradient id="tear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfe6f7"/>
+      <stop offset="1" stop-color="#7fb2dd"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0" stop-color="#fffdf9"/>
+      <stop offset="1" stop-color="#f4ece0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="600" rx="0" fill="url(#bg)"/>
+  <g transform="translate(-24,26) scale(1.11)"><g transform="translate(120,40) scale(0.86)">
+  <g class="cat">
+    <!-- soft contact shadow -->
+    <ellipse cx="100" cy="226" rx="60" ry="10" fill="#000" opacity="0.06"/>
+    <!-- body (sitting) -->
+    <path d="M100 120 C58 120 42 152 42 188 C42 214 60 226 100 226 C140 226 158 214 158 188 C158 152 142 120 100 120 Z" fill="url(#body)"/>
+    <!-- front paws -->
+    <ellipse cx="80" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <ellipse cx="120" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <path d="M74 223 v-6 M80 224 v-7 M86 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M114 223 v-6 M120 224 v-7 M126 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- ears -->
+    <path d="M50 46 L57 12 L86 42 Z" fill="url(#head)"/>
+    <path d="M150 46 L143 12 L114 42 Z" fill="url(#head)"/>
+    <path d="M56 40 L60 22 L76 40 Z" fill="#e7b0a6"/>
+    <path d="M144 40 L140 22 L124 40 Z" fill="#e7b0a6"/>
+    <!-- head -->
+    <path d="M100 28 C62 28 42 54 42 86 C42 114 66 132 100 132 C134 132 158 114 158 86 C158 54 138 28 100 28 Z" fill="url(#head)"/>
+    <!-- sad inner-raised brows -->
+    <path d="M64 62 Q78 56 88 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M136 62 Q122 56 112 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- big teary eyes -->
+    <ellipse cx="78" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <ellipse cx="122" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <!-- watery glisten -->
+    <ellipse cx="78" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <ellipse cx="122" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <circle cx="83" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="127" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="72" cy="86" r="2.4" fill="#dcecf7"/>
+    <circle cx="116" cy="86" r="2.4" fill="#dcecf7"/>
+    <!-- welling tears + drops -->
+    <path d="M68 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M112 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M69 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <path d="M131 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <!-- nose -->
+    <path d="M95 98 h10 l-5 6 Z" fill="#c68b81"/>
+    <!-- sad mouth -->
+    <path d="M100 104 v5" stroke="#9c7c66" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M100 109 q-9 9 -18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M100 109 q9 9 18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- whiskers -->
+    <path d="M60 92 L26 86 M60 99 L26 100 M60 106 L28 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M140 92 L174 86 M140 99 L174 100 M140 106 L172 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+  </g>
+</g><g transform="translate(330,30) scale(0.9)">
+  <g class="cat">
+    <!-- soft contact shadow -->
+    <ellipse cx="100" cy="226" rx="60" ry="10" fill="#000" opacity="0.06"/>
+    <!-- body (sitting) -->
+    <path d="M100 120 C58 120 42 152 42 188 C42 214 60 226 100 226 C140 226 158 214 158 188 C158 152 142 120 100 120 Z" fill="url(#body)"/>
+    <!-- front paws -->
+    <ellipse cx="80" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <ellipse cx="120" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <path d="M74 223 v-6 M80 224 v-7 M86 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M114 223 v-6 M120 224 v-7 M126 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- ears -->
+    <path d="M50 46 L57 12 L86 42 Z" fill="url(#head)"/>
+    <path d="M150 46 L143 12 L114 42 Z" fill="url(#head)"/>
+    <path d="M56 40 L60 22 L76 40 Z" fill="#e7b0a6"/>
+    <path d="M144 40 L140 22 L124 40 Z" fill="#e7b0a6"/>
+    <!-- head -->
+    <path d="M100 28 C62 28 42 54 42 86 C42 114 66 132 100 132 C134 132 158 114 158 86 C158 54 138 28 100 28 Z" fill="url(#head)"/>
+    <!-- sad inner-raised brows -->
+    <path d="M64 62 Q78 56 88 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M136 62 Q122 56 112 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- big teary eyes -->
+    <ellipse cx="78" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <ellipse cx="122" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <!-- watery glisten -->
+    <ellipse cx="78" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <ellipse cx="122" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <circle cx="83" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="127" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="72" cy="86" r="2.4" fill="#dcecf7"/>
+    <circle cx="116" cy="86" r="2.4" fill="#dcecf7"/>
+    <!-- welling tears + drops -->
+    <path d="M68 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M112 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M69 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <path d="M131 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <!-- nose -->
+    <path d="M95 98 h10 l-5 6 Z" fill="#c68b81"/>
+    <!-- sad mouth -->
+    <path d="M100 104 v5" stroke="#9c7c66" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M100 109 q-9 9 -18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M100 109 q9 9 18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- whiskers -->
+    <path d="M60 92 L26 86 M60 99 L26 100 M60 106 L28 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M140 92 L174 86 M140 99 L174 100 M140 106 L172 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+  </g>
+</g><g transform="translate(60,150) scale(1.02)">
+  <g class="cat">
+    <!-- soft contact shadow -->
+    <ellipse cx="100" cy="226" rx="60" ry="10" fill="#000" opacity="0.06"/>
+    <!-- body (sitting) -->
+    <path d="M100 120 C58 120 42 152 42 188 C42 214 60 226 100 226 C140 226 158 214 158 188 C158 152 142 120 100 120 Z" fill="url(#body)"/>
+    <!-- front paws -->
+    <ellipse cx="80" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <ellipse cx="120" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <path d="M74 223 v-6 M80 224 v-7 M86 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M114 223 v-6 M120 224 v-7 M126 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- ears -->
+    <path d="M50 46 L57 12 L86 42 Z" fill="url(#head)"/>
+    <path d="M150 46 L143 12 L114 42 Z" fill="url(#head)"/>
+    <path d="M56 40 L60 22 L76 40 Z" fill="#e7b0a6"/>
+    <path d="M144 40 L140 22 L124 40 Z" fill="#e7b0a6"/>
+    <!-- head -->
+    <path d="M100 28 C62 28 42 54 42 86 C42 114 66 132 100 132 C134 132 158 114 158 86 C158 54 138 28 100 28 Z" fill="url(#head)"/>
+    <!-- sad inner-raised brows -->
+    <path d="M64 62 Q78 56 88 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M136 62 Q122 56 112 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- big teary eyes -->
+    <ellipse cx="78" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <ellipse cx="122" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <!-- watery glisten -->
+    <ellipse cx="78" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <ellipse cx="122" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <circle cx="83" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="127" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="72" cy="86" r="2.4" fill="#dcecf7"/>
+    <circle cx="116" cy="86" r="2.4" fill="#dcecf7"/>
+    <!-- welling tears + drops -->
+    <path d="M68 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M112 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M69 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <path d="M131 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <!-- nose -->
+    <path d="M95 98 h10 l-5 6 Z" fill="#c68b81"/>
+    <!-- sad mouth -->
+    <path d="M100 104 v5" stroke="#9c7c66" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M100 109 q-9 9 -18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M100 109 q9 9 18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- whiskers -->
+    <path d="M60 92 L26 86 M60 99 L26 100 M60 106 L28 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M140 92 L174 86 M140 99 L174 100 M140 106 L172 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+  </g>
+</g><g transform="translate(300,165) scale(0.98)">
+  <g class="cat">
+    <!-- soft contact shadow -->
+    <ellipse cx="100" cy="226" rx="60" ry="10" fill="#000" opacity="0.06"/>
+    <!-- body (sitting) -->
+    <path d="M100 120 C58 120 42 152 42 188 C42 214 60 226 100 226 C140 226 158 214 158 188 C158 152 142 120 100 120 Z" fill="url(#body)"/>
+    <!-- front paws -->
+    <ellipse cx="80" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <ellipse cx="120" cy="223" rx="15" ry="8" fill="#e7d6ba"/>
+    <path d="M74 223 v-6 M80 224 v-7 M86 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M114 223 v-6 M120 224 v-7 M126 223 v-6" stroke="#cdb692" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- ears -->
+    <path d="M50 46 L57 12 L86 42 Z" fill="url(#head)"/>
+    <path d="M150 46 L143 12 L114 42 Z" fill="url(#head)"/>
+    <path d="M56 40 L60 22 L76 40 Z" fill="#e7b0a6"/>
+    <path d="M144 40 L140 22 L124 40 Z" fill="#e7b0a6"/>
+    <!-- head -->
+    <path d="M100 28 C62 28 42 54 42 86 C42 114 66 132 100 132 C134 132 158 114 158 86 C158 54 138 28 100 28 Z" fill="url(#head)"/>
+    <!-- sad inner-raised brows -->
+    <path d="M64 62 Q78 56 88 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M136 62 Q122 56 112 64" stroke="#b79c7e" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- big teary eyes -->
+    <ellipse cx="78" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <ellipse cx="122" cy="84" rx="15.5" ry="18" fill="#2c2521"/>
+    <!-- watery glisten -->
+    <ellipse cx="78" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <ellipse cx="122" cy="90" rx="13.5" ry="12" fill="#3a5a72" opacity="0.55"/>
+    <circle cx="83" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="127" cy="77" r="5" fill="#ffffff"/>
+    <circle cx="72" cy="86" r="2.4" fill="#dcecf7"/>
+    <circle cx="116" cy="86" r="2.4" fill="#dcecf7"/>
+    <!-- welling tears + drops -->
+    <path d="M68 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M112 99 q10 7 20 1" stroke="#9cc6e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M69 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <path d="M131 101 c-4 6 -4 12 0 14 c4 -2 4 -8 0 -14 Z" fill="url(#tear)"/>
+    <!-- nose -->
+    <path d="M95 98 h10 l-5 6 Z" fill="#c68b81"/>
+    <!-- sad mouth -->
+    <path d="M100 104 v5" stroke="#9c7c66" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M100 109 q-9 9 -18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M100 109 q9 9 18 4" stroke="#9c7c66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- whiskers -->
+    <path d="M60 92 L26 86 M60 99 L26 100 M60 106 L28 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M140 92 L174 86 M140 99 L174 100 M140 106 L172 114" stroke="#cdb692" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+  </g>
+</g></g>
+</svg>
