@@ -1,7 +1,7 @@
 // ===== $COPYCAT — clean landing page =====
 
 // Contract address — set this when the coin drops (from a CLEAN wallet).
-const CA = '4YaUff21q1aHWkB625NvGdEHR8Gr3MytHLvSWqp4pump';
+const CA = 'BS2uJTL1m1En7KPUXgWkewTTNvRSPqMCm7zPXFdSpump';
 
 const $ = (s) => document.querySelector(s);
 
