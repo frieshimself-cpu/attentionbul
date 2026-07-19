@@ -16,6 +16,7 @@
     "spam": "tsx src/index.ts --spam",
     "community": "tsx src/index.ts --community",
     "ant": "tsx src/index.ts --ant",
+    "claim-only": "tsx src/index.ts --claim-loop",
     "sweep": "tsx src/index.ts --sweep",
     "preset": "tsx src/index.ts --preset",
     "test": "tsx test/split.test.ts",

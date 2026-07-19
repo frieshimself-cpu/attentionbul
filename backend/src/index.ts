@@ -150,6 +150,33 @@ async function main(): Promise<void> {
     return;
   }
 
+  // CLAIM-ONLY loop: claim creator fees every N seconds and do NOTHING else.
+  // Uses ONLY the CLAIM_WALLET_SECRET wallet — it never touches the launcher, and
+  // it's on the launch ban-list so assertCanLaunch() throws if anything ever tries
+  // to fund/create from it. This mode contains no launch call at all.
+  if (args.includes('--claim-loop')) {
+    const secret = config.claimWalletSecret;
+    if (!secret) { log('claim-loop needs CLAIM_WALLET_SECRET in .env'); process.exit(1); }
+    const claimKp = loadKeypair(secret);
+    const addr = claimKp.publicKey.toBase58();
+    const everySec = Math.max(3, config.spamClaimEverySec);
+    if (config.launchBannedAddresses.includes(addr)) {
+      log(`claim-only: ${addr} is on the LAUNCH BAN-LIST — launching from it is physically refused. ✓`);
+    } else {
+      log(`claim-only: WARNING ${addr} is NOT on LAUNCH_BANNED_ADDRESSES — add it to guarantee the ban.`);
+    }
+    log(`claim-only loop live: claiming creator fees every ${everySec}s${config.dryRun ? ' (DRY RUN)' : ''}. It will NEVER launch/fund anything.`);
+    for (;;) {
+      try {
+        const gained = await claimRewards(claimKp);
+        if (gained > 0n) log(`claim-only: claimed ${lamportsToSol(gained).toFixed(6)} SOL (stays in this wallet)`);
+      } catch (e) {
+        log(`claim-only: claim error (will retry): ${(e as Error).message}`);
+      }
+      await new Promise((r) => setTimeout(r, everySec * 1000));
+    }
+  }
+
   validateLiveConfig();
   const creator = loadKeypair(config.creatorWalletSecret);
 

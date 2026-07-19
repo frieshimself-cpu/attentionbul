@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Keypair, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
-import { config, solToLamports, lamportsToSol } from './config.js';
+import { config, solToLamports, lamportsToSol, assertCanLaunch } from './config.js';
 import { sendSerializedTx, sendInstructions } from './rpc.js';
 import { log, ledger } from './log.js';
 import { BotState, saveState } from './state.js';
@@ -123,6 +123,9 @@ export async function launchSpamPair(
   state: BotState,
   override?: { name?: string; symbol?: string }
 ): Promise<LaunchResult> {
+  // HARD BAN: a claim-only wallet can NEVER launch/fund. Abort before anything.
+  assertCanLaunch(treasury.publicKey.toBase58());
+
   const funding = launchCostLamports();
   // Every trench pair is $COPYCAT by default (that's the concept — flood with
   // THIS coin); SPAM_VARY_NAME=true slightly varies it. An explicit override

@@ -169,7 +169,30 @@ export const config = {
   // Optional FIXED name for ant-watcher launches. Empty = use the joiner's handle
   // (the real behaviour); set to e.g. "test" to name every launch the same (testing).
   antTokenName: process.env.ANT_TOKEN_NAME ?? '',
+
+  // ---- CLAIM-ONLY wallet (HARD BAN on launching) ----
+  // Secret for a wallet used ONLY to claim creator fees. It must NEVER fund or
+  // create anything. Kept in its own var so the launcher never even loads it.
+  claimWalletSecret: process.env.CLAIM_WALLET_SECRET ?? '',
+  // Address(es) that are PERMANENTLY BANNED from launching/funding. launchSpamPair
+  // throws before any SOL moves if the treasury is one of these. Comma-separated.
+  launchBannedAddresses: (process.env.LAUNCH_BANNED_ADDRESSES ?? '')
+    .split(',').map((s) => s.trim()).filter(Boolean),
 } as const;
+
+/**
+ * HARD GUARD: throw if `address` is on the claim-only ban list. Called at the
+ * very top of every launch/fund path so a banned wallet can NEVER deploy — the
+ * process aborts before a single lamport moves or a tx is built.
+ */
+export function assertCanLaunch(address: string): void {
+  if (config.launchBannedAddresses.includes(address)) {
+    throw new Error(
+      `REFUSED: wallet ${address} is CLAIM-ONLY and is permanently banned from ` +
+      `launching/funding. No pair was created and no SOL moved.`
+    );
+  }
+}
 
 /**
  * COIN_MINT may be unset pre-launch. Anything that IS set must be well-formed.
