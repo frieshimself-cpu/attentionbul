@@ -4,3 +4,4 @@ dist/
 state/
 *.log
 get-uri.ts
+ant-watchdog.sh
