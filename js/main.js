@@ -1,7 +1,7 @@
-// ===== $COPYCAT — clean landing page =====
+// ===== $ANTS — carry the log together =====
 
-// Contract address — set this when the coin drops (from a CLEAN wallet).
-const CA = 'BS2uJTL1m1En7KPUXgWkewTTNvRSPqMCm7zPXFdSpump';
+// Contract address.
+const CA = 'ByFkM94JixX54X2mGy4UesVMMqhW6bHMnjsAfDtwpump';
 
 const $ = (s) => document.querySelector(s);
 
@@ -17,14 +17,14 @@ function showToast(msg) {
 
 // copy the contract address
 $('#caBtn').addEventListener('click', async () => {
-  if (!CA) { showToast('Contract drops soon 🐾'); return; }
+  if (!CA) { showToast('Contract drops soon 🐜'); return; }
   try { await navigator.clipboard.writeText(CA); showToast('Contract copied ✓'); }
   catch { showToast(CA); }
 });
 
 // "coming soon" links (chart / socials before launch)
 document.querySelectorAll('[data-soon]').forEach((a) =>
-  a.addEventListener('click', (e) => { e.preventDefault(); showToast('Coming soon 🐾'); })
+  a.addEventListener('click', (e) => { e.preventDefault(); showToast('Coming soon 🐜'); })
 );
 
 // sticky nav shadow on scroll

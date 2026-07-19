@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.38" r="0.85">
+      <stop offset="0" stop-color="#181a1d"/>
+      <stop offset="0.55" stop-color="#0c0d0f"/>
+      <stop offset="1" stop-color="#050506"/>
+    </radialGradient>
+    <linearGradient id="ant" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#3a3d42"/>
+      <stop offset="0.5" stop-color="#212327"/>
+      <stop offset="1" stop-color="#0f1012"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6b7178"/>
+      <stop offset="1" stop-color="#2a2c30"/>
+    </linearGradient>
+    <linearGradient id="log" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b4640"/>
+      <stop offset="0.5" stop-color="#2d2a25"/>
+      <stop offset="1" stop-color="#141311"/>
+    </linearGradient>
+    <linearGradient id="rock" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#2b2d30"/>
+      <stop offset="0.6" stop-color="#141517"/>
+      <stop offset="1" stop-color="#080809"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="1000" fill="url(#bg)"/>
+  
+  <path d="M250 690
+           L300 672 L720 672 L770 692
+           L800 900 L740 1000 L300 1000 L232 862 Z"
+        fill="url(#rock)"/>
+  <!-- top edge highlight -->
+  <path d="M300 672 L720 672" stroke="#54585d" stroke-width="3" opacity="0.7"/>
+  <!-- facets for depth -->
+  <path d="M300 672 L360 690 L330 900 L252 840 Z" fill="#2c2e31" opacity="0.5"/>
+  <path d="M600 672 L720 672 L770 692 L700 880 L640 760 Z" fill="#000" opacity="0.4"/>
+  <path d="M420 700 q10 150 40 290" stroke="#43464a" stroke-width="2" fill="none" opacity="0.4"/>
+
+  <g transform="translate(210,470) scale(0.95)">
+  <g class="ant">
+    <!-- raised front legs (arms) reaching up to the log -->
+    <path d="M54 96 C40 70 34 44 44 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M66 96 C80 70 86 44 76 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M52 60 C44 44 42 34 48 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M68 60 C76 44 78 34 72 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- head -->
+    <ellipse cx="60" cy="74" rx="20" ry="17" fill="url(#ant)"/>
+    <path d="M42 70 a20 17 0 0 1 8 -12" stroke="url(#rim)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- eye glints -->
+    <circle cx="51" cy="72" r="2.4" fill="#8f959c"/>
+    <circle cx="69" cy="72" r="2.4" fill="#8f959c"/>
+    <!-- neck -->
+    <rect x="55" y="88" width="10" height="12" rx="4" fill="url(#ant)"/>
+    <!-- thorax -->
+    <ellipse cx="60" cy="116" rx="17" ry="20" fill="url(#ant)"/>
+    <path d="M45 108 a17 20 0 0 1 6 -14" stroke="url(#rim)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- waist -->
+    <rect x="55" y="132" width="10" height="10" rx="4" fill="url(#ant)"/>
+    <!-- abdomen (big rear segment) -->
+    <ellipse cx="60" cy="164" rx="24" ry="30" fill="url(#ant)"/>
+    <path d="M40 150 a24 30 0 0 1 8 -18" stroke="url(#rim)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <!-- mid legs -->
+    <path d="M46 118 C24 126 14 140 10 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M74 118 C96 126 106 140 110 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- hind legs planted on the rock -->
+    <path d="M48 150 C30 168 24 186 26 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+    <path d="M72 150 C90 168 96 186 94 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  </g>
+</g><g transform="translate(330,464) scale(1.0)">
+  <g class="ant">
+    <!-- raised front legs (arms) reaching up to the log -->
+    <path d="M54 96 C40 70 34 44 44 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M66 96 C80 70 86 44 76 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M52 60 C44 44 42 34 48 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M68 60 C76 44 78 34 72 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- head -->
+    <ellipse cx="60" cy="74" rx="20" ry="17" fill="url(#ant)"/>
+    <path d="M42 70 a20 17 0 0 1 8 -12" stroke="url(#rim)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- eye glints -->
+    <circle cx="51" cy="72" r="2.4" fill="#8f959c"/>
+    <circle cx="69" cy="72" r="2.4" fill="#8f959c"/>
+    <!-- neck -->
+    <rect x="55" y="88" width="10" height="12" rx="4" fill="url(#ant)"/>
+    <!-- thorax -->
+    <ellipse cx="60" cy="116" rx="17" ry="20" fill="url(#ant)"/>
+    <path d="M45 108 a17 20 0 0 1 6 -14" stroke="url(#rim)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- waist -->
+    <rect x="55" y="132" width="10" height="10" rx="4" fill="url(#ant)"/>
+    <!-- abdomen (big rear segment) -->
+    <ellipse cx="60" cy="164" rx="24" ry="30" fill="url(#ant)"/>
+    <path d="M40 150 a24 30 0 0 1 8 -18" stroke="url(#rim)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <!-- mid legs -->
+    <path d="M46 118 C24 126 14 140 10 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M74 118 C96 126 106 140 110 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- hind legs planted on the rock -->
+    <path d="M48 150 C30 168 24 186 26 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+    <path d="M72 150 C90 168 96 186 94 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  </g>
+</g><g transform="translate(452,460) scale(1.02)">
+  <g class="ant">
+    <!-- raised front legs (arms) reaching up to the log -->
+    <path d="M54 96 C40 70 34 44 44 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M66 96 C80 70 86 44 76 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M52 60 C44 44 42 34 48 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M68 60 C76 44 78 34 72 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- head -->
+    <ellipse cx="60" cy="74" rx="20" ry="17" fill="url(#ant)"/>
+    <path d="M42 70 a20 17 0 0 1 8 -12" stroke="url(#rim)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- eye glints -->
+    <circle cx="51" cy="72" r="2.4" fill="#8f959c"/>
+    <circle cx="69" cy="72" r="2.4" fill="#8f959c"/>
+    <!-- neck -->
+    <rect x="55" y="88" width="10" height="12" rx="4" fill="url(#ant)"/>
+    <!-- thorax -->
+    <ellipse cx="60" cy="116" rx="17" ry="20" fill="url(#ant)"/>
+    <path d="M45 108 a17 20 0 0 1 6 -14" stroke="url(#rim)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- waist -->
+    <rect x="55" y="132" width="10" height="10" rx="4" fill="url(#ant)"/>
+    <!-- abdomen (big rear segment) -->
+    <ellipse cx="60" cy="164" rx="24" ry="30" fill="url(#ant)"/>
+    <path d="M40 150 a24 30 0 0 1 8 -18" stroke="url(#rim)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <!-- mid legs -->
+    <path d="M46 118 C24 126 14 140 10 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M74 118 C96 126 106 140 110 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- hind legs planted on the rock -->
+    <path d="M48 150 C30 168 24 186 26 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+    <path d="M72 150 C90 168 96 186 94 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  </g>
+</g><g transform="translate(576,464) scale(1.0)">
+  <g class="ant">
+    <!-- raised front legs (arms) reaching up to the log -->
+    <path d="M54 96 C40 70 34 44 44 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M66 96 C80 70 86 44 76 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M52 60 C44 44 42 34 48 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M68 60 C76 44 78 34 72 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- head -->
+    <ellipse cx="60" cy="74" rx="20" ry="17" fill="url(#ant)"/>
+    <path d="M42 70 a20 17 0 0 1 8 -12" stroke="url(#rim)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- eye glints -->
+    <circle cx="51" cy="72" r="2.4" fill="#8f959c"/>
+    <circle cx="69" cy="72" r="2.4" fill="#8f959c"/>
+    <!-- neck -->
+    <rect x="55" y="88" width="10" height="12" rx="4" fill="url(#ant)"/>
+    <!-- thorax -->
+    <ellipse cx="60" cy="116" rx="17" ry="20" fill="url(#ant)"/>
+    <path d="M45 108 a17 20 0 0 1 6 -14" stroke="url(#rim)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- waist -->
+    <rect x="55" y="132" width="10" height="10" rx="4" fill="url(#ant)"/>
+    <!-- abdomen (big rear segment) -->
+    <ellipse cx="60" cy="164" rx="24" ry="30" fill="url(#ant)"/>
+    <path d="M40 150 a24 30 0 0 1 8 -18" stroke="url(#rim)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <!-- mid legs -->
+    <path d="M46 118 C24 126 14 140 10 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M74 118 C96 126 106 140 110 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- hind legs planted on the rock -->
+    <path d="M48 150 C30 168 24 186 26 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+    <path d="M72 150 C90 168 96 186 94 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  </g>
+</g><g transform="translate(700,470) scale(0.95)">
+  <g class="ant">
+    <!-- raised front legs (arms) reaching up to the log -->
+    <path d="M54 96 C40 70 34 44 44 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M66 96 C80 70 86 44 76 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M52 60 C44 44 42 34 48 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M68 60 C76 44 78 34 72 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- head -->
+    <ellipse cx="60" cy="74" rx="20" ry="17" fill="url(#ant)"/>
+    <path d="M42 70 a20 17 0 0 1 8 -12" stroke="url(#rim)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- eye glints -->
+    <circle cx="51" cy="72" r="2.4" fill="#8f959c"/>
+    <circle cx="69" cy="72" r="2.4" fill="#8f959c"/>
+    <!-- neck -->
+    <rect x="55" y="88" width="10" height="12" rx="4" fill="url(#ant)"/>
+    <!-- thorax -->
+    <ellipse cx="60" cy="116" rx="17" ry="20" fill="url(#ant)"/>
+    <path d="M45 108 a17 20 0 0 1 6 -14" stroke="url(#rim)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- waist -->
+    <rect x="55" y="132" width="10" height="10" rx="4" fill="url(#ant)"/>
+    <!-- abdomen (big rear segment) -->
+    <ellipse cx="60" cy="164" rx="24" ry="30" fill="url(#ant)"/>
+    <path d="M40 150 a24 30 0 0 1 8 -18" stroke="url(#rim)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <!-- mid legs -->
+    <path d="M46 118 C24 126 14 140 10 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M74 118 C96 126 106 140 110 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- hind legs planted on the rock -->
+    <path d="M48 150 C30 168 24 186 26 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+    <path d="M72 150 C90 168 96 186 94 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  </g>
+</g>
+  
+  <g transform="rotate(-2 500 452)">
+    <rect x="196" y="430" width="620" height="46" rx="23" fill="url(#log)"/>
+    <!-- knot on the left end -->
+    <circle cx="216" cy="453" r="30" fill="url(#log)"/>
+    <circle cx="212" cy="450" r="12" fill="#0e0d0c"/>
+    <!-- bark striations -->
+    <path d="M250 440 h520 M250 453 h540 M250 466 h500" stroke="#0d0c0b" stroke-width="2" opacity="0.6"/>
+    <path d="M300 435 l14 36 M430 434 l12 38 M560 435 l14 36 M690 436 l12 36" stroke="#0c0b0a" stroke-width="1.6" opacity="0.5"/>
+    <!-- top rim light -->
+    <path d="M210 432 q300 -10 590 2" stroke="#6a655c" stroke-width="2.4" fill="none" opacity="0.7"/>
+  </g>
+
+</svg>
