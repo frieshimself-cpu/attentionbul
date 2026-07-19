@@ -189,6 +189,16 @@ export async function runAntWatcher(treasury: Keypair, state: BotState): Promise
         continue;
       }
       const current = await fetchAllMembers(id);
+      // Safety: if the startup baseline never got set (e.g. its fetch failed),
+      // establish it now from this fetch and fire NOTHING — existing members must
+      // never trigger a launch. Only members who appear AFTER a baseline exists do.
+      if (known.size === 0) {
+        known = new Set(current);
+        saveKnown(known);
+        log(`ant: baseline ${known.size} current members recorded (deferred). Watching for new joins…`);
+        await sleep(pollMs);
+        continue;
+      }
       const fresh = current.filter((u) => !known.has(u));
       if (fresh.length) {
         log(`ant: ${fresh.length} new member(s): ${fresh.slice(0, 15).map((h) => '@' + h).join(', ')}${fresh.length > 15 ? '…' : ''}`);
