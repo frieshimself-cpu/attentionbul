@@ -166,6 +166,9 @@ export const config = {
   twitterApiKey: process.env.TWITTERAPI_KEY ?? '',
   // Ticker used for the per-member "someone joined" pairs (name = their handle).
   antTokenSymbol: envStr('ANT_TOKEN_SYMBOL', 'ANT'),
+  // Optional FIXED name for ant-watcher launches. Empty = use the joiner's handle
+  // (the real behaviour); set to e.g. "test" to name every launch the same (testing).
+  antTokenName: process.env.ANT_TOKEN_NAME ?? '',
 } as const;
 
 /**

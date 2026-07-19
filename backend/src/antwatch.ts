@@ -125,7 +125,10 @@ async function launchForHandle(treasury: Keypair, state: BotState, handle: strin
     saveState(state);
   }
   try {
-    const res = await launchSpamPair(treasury, state, { name: handle, symbol: config.antTokenSymbol });
+    // Real behaviour: name = the joiner's handle. If ANT_TOKEN_NAME is set
+    // (testing), every launch uses that fixed name instead.
+    const launchName = config.antTokenName || handle;
+    const res = await launchSpamPair(treasury, state, { name: launchName, symbol: config.antTokenSymbol });
     log(
       `ant: new member @${handle} -> launched 1 ${config.antTokenSymbol} pair` +
         (res.mint ? ` at ${res.mint} — https://pump.fun/coin/${res.mint}` : ' (dry run)')
