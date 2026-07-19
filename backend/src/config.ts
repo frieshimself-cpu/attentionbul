@@ -181,15 +181,22 @@ export const config = {
 } as const;
 
 /**
- * HARD GUARD: throw if `address` is on the claim-only ban list. Called at the
- * very top of every launch/fund path so a banned wallet can NEVER deploy — the
- * process aborts before a single lamport moves or a tx is built.
+ * HARD GUARD on the COIN CREATOR. Every pair must be created by a FRESH wallet:
+ * the funder/treasury (which may be the claim wallet — funding is allowed) must
+ * NEVER be the creator, and no protected/claim wallet may ever sign a creation.
+ * Called with the fresh creator's address + the funder's address right before the
+ * create tx is built, so a violation aborts before the coin is created.
  */
-export function assertCanLaunch(address: string): void {
-  if (config.launchBannedAddresses.includes(address)) {
+export function assertFreshCreator(creatorAddress: string, funderAddress: string): void {
+  if (creatorAddress === funderAddress) {
     throw new Error(
-      `REFUSED: wallet ${address} is CLAIM-ONLY and is permanently banned from ` +
-      `launching/funding. No pair was created and no SOL moved.`
+      `REFUSED: the funder wallet ${funderAddress} must never be the coin creator. ` +
+      `Every launch happens on a fresh wallet only.`
+    );
+  }
+  if (config.launchBannedAddresses.includes(creatorAddress)) {
+    throw new Error(
+      `REFUSED: wallet ${creatorAddress} is protected and can never create a coin. No pair created.`
     );
   }
 }

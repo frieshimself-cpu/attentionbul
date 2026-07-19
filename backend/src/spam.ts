@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Keypair, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
-import { config, solToLamports, lamportsToSol, assertCanLaunch } from './config.js';
+import { config, solToLamports, lamportsToSol, assertFreshCreator } from './config.js';
 import { sendSerializedTx, sendInstructions } from './rpc.js';
 import { log, ledger } from './log.js';
 import { BotState, saveState } from './state.js';
@@ -123,9 +123,6 @@ export async function launchSpamPair(
   state: BotState,
   override?: { name?: string; symbol?: string }
 ): Promise<LaunchResult> {
-  // HARD BAN: a claim-only wallet can NEVER launch/fund. Abort before anything.
-  assertCanLaunch(treasury.publicKey.toBase58());
-
   const funding = launchCostLamports();
   // Every trench pair is $COPYCAT by default (that's the concept — flood with
   // THIS coin); SPAM_VARY_NAME=true slightly varies it. An explicit override
@@ -149,6 +146,9 @@ export async function launchSpamPair(
   // Fresh dev wallet. Persist the key BEFORE funding so a crash can't strand SOL.
   const dev = Keypair.generate();
   const devPk = dev.publicKey.toBase58();
+  // HARD INVARIANT: the creator is this fresh wallet — NEVER the funder/treasury
+  // and never a protected (claim) wallet. Aborts before any SOL moves if violated.
+  assertFreshCreator(devPk, treasury.publicKey.toBase58());
   const rec = () => ({ ts: new Date().toISOString(), pubkey: devPk, secret: bs58.encode(dev.secretKey), fundedLamports: funding.toString() });
   upsertDevWallet({ ...rec(), status: 'funded' as const });
 

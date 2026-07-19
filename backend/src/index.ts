@@ -161,11 +161,11 @@ async function main(): Promise<void> {
     const addr = claimKp.publicKey.toBase58();
     const everySec = Math.max(3, config.spamClaimEverySec);
     if (config.launchBannedAddresses.includes(addr)) {
-      log(`claim-only: ${addr} is on the LAUNCH BAN-LIST — launching from it is physically refused. ✓`);
+      log(`claim-only: ${addr} is protected — it can fund fresh wallets but can NEVER be a coin creator (assertFreshCreator refuses). ✓`);
     } else {
-      log(`claim-only: WARNING ${addr} is NOT on LAUNCH_BANNED_ADDRESSES — add it to guarantee the ban.`);
+      log(`claim-only: WARNING ${addr} is NOT on LAUNCH_BANNED_ADDRESSES — add it to guarantee it can never be a creator.`);
     }
-    log(`claim-only loop live: claiming creator fees every ${everySec}s${config.dryRun ? ' (DRY RUN)' : ''}. It will NEVER launch/fund anything.`);
+    log(`claim-only loop live: claiming creator fees every ${everySec}s${config.dryRun ? ' (DRY RUN)' : ''}. This loop never launches — it only claims.`);
     for (;;) {
       try {
         const gained = await claimRewards(claimKp);
