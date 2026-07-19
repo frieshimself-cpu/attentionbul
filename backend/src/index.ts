@@ -12,6 +12,7 @@ import { claimRewards, getClaimable } from './claim.js';
 import { launchSpamPair, launchCostLamports } from './spam.js';
 import { runSpamEngine, throttleIntervalSec } from './engine.js';
 import { runCommunityWatcher } from './community.js';
+import { runAntWatcher } from './antwatch.js';
 import { sweepDevWallets } from './sweep.js';
 import { loadDevWallets } from './keystore.js';
 import { log, ledger } from './log.js';
@@ -161,7 +162,7 @@ async function main(): Promise<void> {
   log(`wallet: ${creator.publicKey.toBase58()}`);
 
   // Fail fast rather than spin-and-fail: a live launch needs a metadata source.
-  const needsMetadata = args.includes('--spam') || args.includes('--launch-one') || args.includes('--community');
+  const needsMetadata = args.includes('--spam') || args.includes('--launch-one') || args.includes('--community') || args.includes('--ant');
   if (needsMetadata && !config.dryRun && !config.spamMetadataUri && !config.pinataJwt) {
     log('CANNOT LAUNCH LIVE: no metadata source. Set PINATA_JWT (to pin link-free metadata) ' +
       'or SPAM_METADATA_URI (reuse an existing pinned URI) in .env, then retry.');
@@ -177,6 +178,12 @@ async function main(): Promise<void> {
   // X community join-watcher: spam N pairs every time someone joins the community.
   if (args.includes('--community')) {
     await runCommunityWatcher(creator, state);
+    return;
+  }
+
+  // Ant-watcher: 1 pair per NEW community member, named after their @handle (ticker ANT).
+  if (args.includes('--ant')) {
+    await runAntWatcher(creator, state);
     return;
   }
 

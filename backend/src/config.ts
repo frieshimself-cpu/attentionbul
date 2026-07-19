@@ -161,6 +161,11 @@ export const config = {
   // Optional X API v2 bearer token for reliable member_count reads. Without it
   // the watcher falls back to state/member-count.txt, then a best-effort scrape.
   xBearerToken: process.env.X_BEARER_TOKEN ?? '',
+  // twitterapi.io key (unofficial API) — reads the community member LIST so the
+  // ant-watcher can diff it and launch a pair per NEW member.
+  twitterApiKey: process.env.TWITTERAPI_KEY ?? '',
+  // Ticker used for the per-member "someone joined" pairs (name = their handle).
+  antTokenSymbol: envStr('ANT_TOKEN_SYMBOL', 'ANT'),
 } as const;
 
 /**

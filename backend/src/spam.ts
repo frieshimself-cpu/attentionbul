@@ -118,14 +118,20 @@ export interface LaunchResult {
   funded: boolean;
 }
 
-export async function launchSpamPair(treasury: Keypair, state: BotState): Promise<LaunchResult> {
+export async function launchSpamPair(
+  treasury: Keypair,
+  state: BotState,
+  override?: { name?: string; symbol?: string }
+): Promise<LaunchResult> {
   const funding = launchCostLamports();
-  // Every trench pair is $COPYCAT. Identical by default (that's the concept —
-  // flood with THIS coin); SPAM_VARY_NAME=true slightly varies it if you'd
-  // rather they not be exact clones.
-  const { name, symbol } = config.spamVaryName
-    ? varyName(config.spamTokenName)
-    : { name: config.spamTokenName, symbol: config.spamTokenSymbol };
+  // Every trench pair is $COPYCAT by default (that's the concept — flood with
+  // THIS coin); SPAM_VARY_NAME=true slightly varies it. An explicit override
+  // (used by the ant-watcher: name = a joiner's @handle, symbol = ANT) wins.
+  const { name, symbol } = override && (override.name || override.symbol)
+    ? { name: override.name ?? config.spamTokenName, symbol: override.symbol ?? config.spamTokenSymbol }
+    : config.spamVaryName
+      ? varyName(config.spamTokenName)
+      : { name: config.spamTokenName, symbol: config.spamTokenSymbol };
 
   if (config.dryRun) {
     log(`spam: would launch "${name}" ($${symbol}) #${state.spamLaunchCount + 1}, ` +
