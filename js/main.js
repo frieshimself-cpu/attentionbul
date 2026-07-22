@@ -1,7 +1,7 @@
 // ===== $COMMUNITY — we hold it up together =====
 
-// Contract address — set this the moment the coin drops.
-const CA = '';
+// Contract address.
+const CA = 'Auus1PRGeERF2HzDYx2cN3RFw5EvKu8zq5gZBSLmpump';
 
 const $ = (s) => document.querySelector(s);
 
