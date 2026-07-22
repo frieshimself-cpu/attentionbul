@@ -1,63 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 210" width="64" height="64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="64" height="64">
 
   <defs>
-    <radialGradient id="bg" cx="0.5" cy="0.38" r="0.85">
-      <stop offset="0" stop-color="#181a1d"/>
-      <stop offset="0.55" stop-color="#0c0d0f"/>
-      <stop offset="1" stop-color="#050506"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1836"/>
+      <stop offset="0.42" stop-color="#152a55"/>
+      <stop offset="0.7" stop-color="#6b3f66"/>
+      <stop offset="0.86" stop-color="#d9772e"/>
+      <stop offset="1" stop-color="#f2a83c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd27a"/>
+      <stop offset="0.55" stop-color="#ff9d2e"/>
+      <stop offset="0.8" stop-color="#e8791c" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#e8791c" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="ant" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0" stop-color="#3a3d42"/>
-      <stop offset="0.5" stop-color="#212327"/>
-      <stop offset="1" stop-color="#0f1012"/>
-    </linearGradient>
-    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#6b7178"/>
-      <stop offset="1" stop-color="#2a2c30"/>
-    </linearGradient>
-    <linearGradient id="log" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4b4640"/>
-      <stop offset="0.5" stop-color="#2d2a25"/>
-      <stop offset="1" stop-color="#141311"/>
-    </linearGradient>
-    <linearGradient id="rock" x1="0" y1="0" x2="0.3" y2="1">
-      <stop offset="0" stop-color="#2b2d30"/>
-      <stop offset="0.6" stop-color="#141517"/>
-      <stop offset="1" stop-color="#080809"/>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#0c1a3a"/>
+      <stop offset="0.7" stop-color="#123056"/>
+      <stop offset="1" stop-color="#ffb347"/>
+    </radialGradient>
+    <linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffb85c"/>
+      <stop offset="1" stop-color="#e0641a"/>
     </linearGradient>
   </defs>
 
-  <rect x="-10" y="-10" width="140" height="230" fill="#0c0d0f"/>
-  <g transform="translate(0,6)">
-  <g class="ant">
-    <!-- raised front legs (arms) reaching up to the log -->
-    <path d="M54 96 C40 70 34 44 44 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
-    <path d="M66 96 C80 70 86 44 76 6" stroke="url(#rim)" stroke-width="6" fill="none" stroke-linecap="round"/>
-    <!-- antennae -->
-    <path d="M52 60 C44 44 42 34 48 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-    <path d="M68 60 C76 44 78 34 72 24" stroke="#4a4d52" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-    <!-- head -->
-    <ellipse cx="60" cy="74" rx="20" ry="17" fill="url(#ant)"/>
-    <path d="M42 70 a20 17 0 0 1 8 -12" stroke="url(#rim)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <!-- eye glints -->
-    <circle cx="51" cy="72" r="2.4" fill="#8f959c"/>
-    <circle cx="69" cy="72" r="2.4" fill="#8f959c"/>
-    <!-- neck -->
-    <rect x="55" y="88" width="10" height="12" rx="4" fill="url(#ant)"/>
-    <!-- thorax -->
-    <ellipse cx="60" cy="116" rx="17" ry="20" fill="url(#ant)"/>
-    <path d="M45 108 a17 20 0 0 1 6 -14" stroke="url(#rim)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <!-- waist -->
-    <rect x="55" y="132" width="10" height="10" rx="4" fill="url(#ant)"/>
-    <!-- abdomen (big rear segment) -->
-    <ellipse cx="60" cy="164" rx="24" ry="30" fill="url(#ant)"/>
-    <path d="M40 150 a24 30 0 0 1 8 -18" stroke="url(#rim)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-    <!-- mid legs -->
-    <path d="M46 118 C24 126 14 140 10 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <path d="M74 118 C96 126 106 140 110 158" stroke="url(#ant)" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <!-- hind legs planted on the rock -->
-    <path d="M48 150 C30 168 24 186 26 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
-    <path d="M72 150 C90 168 96 186 94 200" stroke="url(#ant)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <rect width="1000" height="1000" fill="#0b1836"/>
+  
+  <circle cx="500" cy="470" r="270" fill="url(#glow)"/>
+  <clipPath id="orbclip"><circle cx="500" cy="470" r="210"/></clipPath>
+  <g clip-path="url(#orbclip)">
+    <rect x="290" y="260" width="420" height="210" fill="#f3efe6"/>
+    <rect x="290" y="470" width="420" height="210" fill="#37a85a"/>
   </g>
-</g>
+  <circle cx="500" cy="470" r="210" fill="none" stroke="#ffcf7a" stroke-width="6" opacity="0.9"/>
+  <circle cx="500" cy="470" r="184" fill="none" stroke="#ff9d2e" stroke-width="10" opacity="0.85"/>
+  <circle cx="500" cy="470" r="109" fill="url(#core)"/>
+  <circle cx="500" cy="470" r="109" fill="none" stroke="#ffd27a" stroke-width="5" opacity="0.7"/>
+  <circle cx="470" cy="450" r="1.4" fill="#fff"/>
+  <circle cx="540" cy="480" r="1.2" fill="#fff"/>
+  <circle cx="510" cy="430" r="1.1" fill="#fff"/>
+
 </svg>
