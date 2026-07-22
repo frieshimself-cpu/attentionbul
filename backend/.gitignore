@@ -5,3 +5,4 @@ state/
 *.log
 get-uri.ts
 ant-watchdog.sh
+build-launch-metadata.ts
