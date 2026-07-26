@@ -1,7 +1,7 @@
-// ===== $COMMUNITY — we hold it up together =====
+// ===== $HELLO?? — READ THIS IS INSANE =====
 
-// Contract address.
-const CA = 'Auus1PRGeERF2HzDYx2cN3RFw5EvKu8zq5gZBSLmpump';
+// Contract address. Empty until launch → the pill shows "Coming soon".
+const CA = '';
 
 const $ = (s) => document.querySelector(s);
 
@@ -17,14 +17,14 @@ function showToast(msg) {
 
 // copy the contract address
 $('#caBtn').addEventListener('click', async () => {
-  if (!CA) { showToast('Contract drops soon 🤝'); return; }
+  if (!CA) { showToast('Contract drops soon 👉'); return; }
   try { await navigator.clipboard.writeText(CA); showToast('Contract copied ✓'); }
   catch { showToast(CA); }
 });
 
 // "coming soon" links (chart / socials before launch)
 document.querySelectorAll('[data-soon]').forEach((a) =>
-  a.addEventListener('click', (e) => { e.preventDefault(); showToast('Coming soon 🤝'); })
+  a.addEventListener('click', (e) => { e.preventDefault(); showToast('Coming soon 👉'); })
 );
 
 // sticky nav shadow on scroll
