@@ -1,7 +1,7 @@
 // ===== $HELLO?? — READ THIS IS INSANE =====
 
-// Contract address. Empty until launch → the pill shows "Coming soon".
-const CA = '';
+// Contract address.
+const CA = '3jELHUCxnuis8Z7VF5najBQ3CsEEf16ouagzz8dvpump';
 
 const $ = (s) => document.querySelector(s);
 
