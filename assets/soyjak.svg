@@ -1,54 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 720" width="820" height="720">
-  <rect width="820" height="720" fill="#ffffff"/>
-  <g fill="none" stroke="#111111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <!-- head / bald cranium down to bearded jaw -->
-    <path d="M410 330
-             C405 150 505 78 615 120
-             C712 158 726 285 700 380
-             C684 470 640 560 560 606
-             C505 636 452 632 415 588"/>
-    <!-- left cheek / jaw back up to temple -->
-    <path d="M415 588 C388 545 380 430 410 330"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1123 1090" width="1123" height="1090">
+  <rect width="1123" height="1090" fill="#ffffff"/>
+  <g fill="none" stroke="#111111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
 
-    <!-- forehead wrinkles -->
-    <path d="M470 210 C540 188 620 190 690 214"/>
-    <path d="M462 236 C540 214 626 216 700 244"/>
-    <path d="M470 262 C544 244 622 246 694 272"/>
+    <!-- ===== head: bald dome down the right side into the beard ===== -->
+    <path d="M523 610
+             C470 520 478 380 523 300
+             C548 150 665 92 778 98
+             C902 104 1016 200 1017 362
+             C1018 470 988 560 952 632"/>
 
-    <!-- eyebrows -->
-    <path d="M486 356 C520 336 560 338 590 356"/>
-    <path d="M628 352 C660 336 694 340 716 360"/>
+    <!-- ===== forehead wrinkles ===== -->
+    <path d="M534 300 C620 268 760 250 862 236"/>
+    <path d="M528 344 C620 312 758 300 848 292"/>
 
-    <!-- eyes (looking left) -->
-    <path d="M500 392 C520 372 566 372 590 396 C566 420 520 420 500 392 Z"/>
-    <path d="M636 388 C658 370 700 372 720 394 C700 418 660 418 636 388 Z"/>
-    <circle cx="524" cy="396" r="13" fill="#111"/>
-    <circle cx="662" cy="392" r="13" fill="#111"/>
+    <!-- ===== eyebrows ===== -->
+    <path d="M566 432 C610 414 662 414 694 428"/>
+    <path d="M744 424 C784 410 848 416 886 436"/>
 
-    <!-- nose -->
-    <path d="M612 402 C606 452 600 496 588 520 C606 536 636 534 652 520"/>
+    <!-- ===== eyes (looking slightly left) ===== -->
+    <path d="M576 470 C602 446 664 446 692 472 C664 500 602 500 576 470 Z"/>
+    <path d="M756 456 C786 436 852 438 880 462 C852 486 786 486 756 456 Z"/>
+    <circle cx="622" cy="476" r="23" fill="#111"/>
+    <circle cx="808" cy="462" r="23" fill="#111"/>
 
-    <!-- open shocked mouth -->
-    <path d="M556 566 C556 528 636 528 638 566 C640 606 558 610 556 566 Z" fill="#111" stroke="#111"/>
+    <!-- ===== big nose ===== -->
+    <path d="M726 466 C716 540 706 600 690 646 C712 668 758 664 780 642"/>
 
-    <!-- beard stubble strokes along the jaw/chin -->
-    <g stroke-width="3">
-      <path d="M470 470 l-14 26 M498 502 l-12 28 M534 528 l-10 28 M576 546 l-8 30
-               M624 548 l-4 30 M666 536 l4 30 M700 512 l12 26 M714 470 l18 22
-               M452 432 l-18 18 M700 452 l20 12"/>
+    <!-- ===== shocked open mouth (filled) ===== -->
+    <path d="M656 742 C654 686 812 686 812 748 C812 812 658 814 656 742 Z" fill="#111" stroke="#111"/>
+
+    <!-- ===== beard: stubble hatch around jaw + mouth ===== -->
+    <g stroke-width="4">
+      <path d="M566 636 l-16 34 M596 676 l-14 38 M628 712 l-12 40 M584 730 l-16 30
+               M636 772 l-12 40 M690 812 l-8 42 M748 838 l-4 44 M812 842 l4 44
+               M868 820 l10 40 M916 780 l16 34 M948 726 l24 26 M962 664 l30 18
+               M898 690 l20 34 M840 664 l14 40 M556 700 l-20 26 M934 706 l26 20
+               M700 862 l0 44 M760 872 l2 44 M628 852 l-6 40"/>
     </g>
 
-    <!-- neck + shoulders -->
-    <path d="M470 604 C470 648 470 680 470 712"/>
-    <path d="M600 606 C610 650 640 690 690 712"/>
-    <path d="M430 660 C500 636 560 636 600 654"/>
+    <!-- ===== jaw / chin bottom under the beard ===== -->
+    <path d="M566 636 C560 760 620 858 742 878 C858 858 928 760 952 632"/>
 
-    <!-- pointing arm reaching to the LEFT -->
-    <path d="M470 616 C360 636 250 690 120 700"/>
-    <path d="M470 664 C360 690 250 712 150 720"/>
-    <!-- pointing hand / index finger -->
-    <path d="M150 700 C120 690 96 672 84 646 C104 636 128 638 150 648"/>
-    <path d="M84 646 C70 640 58 646 54 660 C64 672 82 672 96 664"/>
-    <path d="M150 700 C138 710 130 716 118 718"/>
+    <!-- ===== neck + right shoulder ===== -->
+    <path d="M700 878 C700 930 700 970 700 1020"/>
+    <path d="M932 700 C980 800 1030 900 1090 970"/>
+    <path d="M812 894 C900 878 990 900 1050 946"/>
+
+    <!-- ===== left torso edge ===== -->
+    <path d="M566 720 C520 820 490 920 470 1020"/>
+
+    <!-- ===== arm pointing LEFT ===== -->
+    <path d="M556 636 C446 632 336 640 252 642"/>
+    <path d="M566 742 C452 766 344 756 256 730"/>
+
+    <!-- ===== pointing hand: fist, index finger extended left, thumb up ===== -->
+    <path d="M252 642
+             C236 640 220 639 205 638
+             C165 634 122 632 92 636
+             C82 638 82 652 92 656
+             C130 662 168 666 205 668
+             C212 690 220 710 245 728
+             C250 731 254 731 256 728 Z"/>
+    <path d="M208 640 C205 616 210 600 224 600 C236 602 236 618 230 636"/>
   </g>
 </svg>
